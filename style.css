@@ -99,7 +99,7 @@ body {
    Nav links have a gold underline that draws left→right on hover.
 ───────────────────────────────────────────────────────────── */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  position: fixed; top: 0; left: 0; right: 10rem; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.2rem 4rem;
   background: transparent;
@@ -161,9 +161,9 @@ nav.scrolled {
    All absolutely-positioned layers fill the hero container.
 ───────────────────────────────────────────────────────────── */
 .hero {
-  min-height: 100vh;
+  min-height: 120vh;
   background: var(--green);
-  position: relative; overflow: hidden;
+  position: center; overflow: auto;
   display: grid; place-items: center; /* centres hero-content */
 }
 
@@ -296,7 +296,7 @@ nav.scrolled {
 
 /* Hours bar at base of hero */
 .hero-hours {
-  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  position: center; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
   display: flex; gap: 2rem; z-index: 2;
   animation: fadeUp .7s .6s both;
 }
@@ -383,10 +383,19 @@ nav.scrolled {
 /* Ghost "AOC" lettermark — purely decorative, very low opacity */
 .about-image-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(6rem, 16vw, 14rem);
-  font-weight: 300; font-style: italic;
-  color: rgba(247,237,216,.06);
-  line-height: 1; user-select: none; text-align: center;
+  font-size: clamp(4rem, 12vw, 10rem);
+  font-weight: 300; 
+  font-style: italic;
+  color: rgba(247,237,216,.06); /* Very low opacity */
+  line-height: 1; 
+  user-select: none; 
+  text-align: center;
+  
+  /* New Flexbox properties */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem; /* Space between logo and text */
 }
 
 /* Stat cards — each floats vertically via floatY animation (staggered) */
@@ -1332,8 +1341,10 @@ footer {
   0%,100% { box-shadow: 0 0 0   0 rgba(217,112,58,0); }
   50%     { box-shadow: 0 0 8px 3px rgba(217,112,58,.45); }
 }
+
+/* ───────────────────────────────────────────────────────────── 
    Collapse multi-column layouts at narrower breakpoints.
-───────────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────────── */
 /* ─────────────────────────────────────────────────────────────
    20. RESPONSIVE / MEDIA QUERIES
    Three breakpoints:
@@ -1356,178 +1367,92 @@ footer {
 ───────────────────────────────────────────────────────────── */
 
 /* ── TABLET (≤ 900px) ─────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   20. RESPONSIVE / MEDIA QUERIES (FIXED)
+───────────────────────────────────────────────────────────── */
+
+/* GLOBAL MOBILE RESET */
 @media (max-width: 900px) {
-
   /* ── Navigation ── */
-  nav { padding: 1rem 1.2rem; }
-  .nav-links { display: none; }    /* hamburger would go here in a real project */
+  nav { 
+    padding: 1rem 1.2rem; 
+    width: 100%;
+  }
+  .nav-links { display: none; }
 
-  /* ── Hero ──
-     FIX ①: clamp(min, preferred, max) scales the title with vw.
-     At 400px wide: clamp gives ~2.2rem — fits without overflow.
-     overflow:hidden on .hero clips anything that somehow still bleeds. */
-  .hero { overflow: hidden; }
-
+  /* ── Hero Section ── */
+  .hero { 
+    overflow: hidden; 
+    width: 100%;
+    padding: 0 1rem;
+  }
   .hero-title {
-    font-size: clamp(2.2rem, 10vw, 4.5rem) !important;
-    /* !important overrides the desktop clamp set on the element directly */
-    line-height: 1.05;
-    word-break: break-word;   /* prevent single long word from overflowing */
+    font-size: clamp(2.2rem, 10vw, 4rem) !important;
+    line-height: 1.1;
+    word-wrap: break-word; /* Prevent long words from pushing width */
   }
 
-  .hero-eyebrow { font-size: .62rem; letter-spacing: .16em; }
-
-  .hero-sub {
-    font-size: .9rem;
-    max-width: 100%;           /* was 540px — let it fill mobile width */
-    padding: 0 .5rem;
+  /* ── Kinetic Text Bands (The Ghost Text) ── */
+  /* These often cause the overflow because they are very wide */
+  .kinetic-band {
+    width: 100% !important;
+    overflow: hidden;
   }
-
-  .hero-badge { font-size: .6rem; padding: .3rem .8rem; }
-
-  .hero-hours {
-    gap: .6rem;
-    bottom: 3.5rem;
-    flex-wrap: wrap;           /* hours wrap to 2 rows if very narrow */
-    justify-content: center;
-    padding: 0 1rem;
-  }
-  .hero-hour .day  { font-size: .55rem; }
-  .hero-hour .time { font-size: .75rem; }
-  .hero-scroll { display: none; }    /* scroll prompt not needed on touch */
-
-  /* ── Marquee ──
-     FIX ⑤: double the animation-duration (22s → 44s) on mobile.
-     Fast marquees cause layout thrashing on low-power chipsets,
-     which shows as jitter / dropped frames. Slower = smoother. */
-  .marquee-track { animation-duration: 44s; }
-
-  /* ── Love banner ── */
-  .love-banner { padding: .7rem 1rem; }
-  .love-banner-text { font-size: .9rem; }
-
-  /* ── Kinetic bands ──
-     FIX ②: shrink ghost text so it can't push page width.
-     overflow:hidden on .kinetic-band clips the overflow, but
-     a huge font-size can still affect scroll width in some browsers.
-     Setting a fixed px value at mobile width prevents that. */
   .kinetic-item {
-    font-size: clamp(1.8rem, 6vw, 3rem) !important;
-    padding: 0 1rem;
-  }
-  .kinetic-sep { font-size: .9rem; }
-
-  /* ── About section ──
-     FIX ③: reduce aggressive desktop padding (6rem 5rem → 2.5rem 1.2rem).
-     1.2rem sides means 19px on a 320px phone — enough breathing room
-     without text touching the edge. */
-  .about { grid-template-columns: 1fr; }
-  .about-image { min-height: 280px; }
-  .about-stats {
-    bottom: 1.5rem; left: 1.2rem; right: 1.2rem;
-    gap: 1rem;
-  }
-  .stat-num   { font-size: 2rem; }
-  .stat-label { font-size: .6rem; }
-
-  .about-text {
-    padding: 2.5rem 1.2rem !important;  /* FIX ③ — was 6rem 5rem */
-  }
-  .about-heading { font-size: clamp(1.8rem, 6vw, 2.8rem); }
-  .about-body    { font-size: .92rem; max-width: 100%; }
-
-  /* ── Story pin ── */
-  .story-sticky { grid-template-columns: 1fr; }
-  .story-right  { display: none; }
-  .story-left   { padding: 3rem 1.2rem; }
-  .story-dish-name { font-size: clamp(2rem, 7vw, 3.5rem); }
-  .story-dish-desc { font-size: .88rem; }
-
-  /* ── Services ── */
-  .services-top  { grid-template-columns: 1fr; gap: 1rem; }
-  .services-grid { grid-template-columns: 1fr; }
-  .services-heading { font-size: clamp(1.8rem, 6vw, 2.8rem); }
-  .services, .menu-section, .testimonials, .area {
-    padding: 3.5rem 1.2rem;   /* FIX ③ — consistent safe padding */
+    font-size: clamp(2rem, 8vw, 3.5rem) !important;
   }
 
-  /* ── Packages ──
-     FIX ③: was 4rem 2rem — reduce to 1.2rem horizontal on phone.
-     Also reduce video height so it doesn't dominate small screens. */
-  .packages { padding: 3.5rem 1.2rem; }
-  .pkg-grid { grid-template-columns: 1fr; }
-  .pkg-card { padding: 1.8rem 1.2rem; }
-  .pkg-video-wrap { height: 280px; border-radius: 4px; }
-  .pkg-video-content { padding: 1.2rem; }
-  .packages-heading { font-size: clamp(1.8rem, 6vw, 2.8rem); }
-  .packages-sub     { font-size: .85rem; }
-  .packages-inner   { padding: 0; }  /* inner div doesn't need extra padding */
+  /* ── Grid Layouts to Single Column ── */
+  .about, 
+  .services-grid, 
+  .pkg-grid, 
+  .menu-grid, 
+  .testimonial-grid,
+  .story-sticky {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 2rem 1.2rem !important;
+    gap: 2rem;
+  }
 
-  /* ── Menu ── */
-  .menu-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
-  .menu-heading { font-size: clamp(2rem, 7vw, 3rem); }
-  .menu-grid { grid-template-columns: 1fr; gap: 1rem; }
-  /* Disable 3D tilt on touch — pointer events don't track on mobile.
-     overflow:visible on menu-card causes emoji to clip — restore on mobile. */
-  .menu-card { overflow: hidden !important; }
-  .menu-card-emoji { display: none; }   /* emoji pop needs hover — no hover on touch */
+  .about-image { 
+    width: 100%;
+    min-height: 300px; 
+  }
 
-  /* ── Testimonials ── */
-  .testimonials-grid,
-  .testimonial-grid { grid-template-columns: 1fr; }
-  .testimonials-heading { font-size: clamp(1.8rem, 6vw, 2.6rem); }
+  /* ── Packages & Menu ── */
+  .pkg-card, .menu-card {
+    width: 100% !important;
+  }
+  .pkg-video-wrap {
+    height: 250px;
+  }
 
   /* ── Footer ── */
   footer {
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    padding: 3rem 1.2rem;    /* FIX ③ */
-  }
-  .footer-bottom {
-    flex-direction: column;
-    gap: .5rem;
-    padding: 1rem 1.2rem;
+    grid-template-columns: 1fr;
     text-align: center;
+    padding: 3rem 1.2rem;
   }
+  .footer-hour-row { justify-content: center; }
 
-  /* ── Custom cursor — hidden on touch devices ──
-     FIX ④: cursors make no sense on touchscreens and the rAF loop
-     wastes CPU. CSS hides the elements; JS skips the logic entirely
-     (see isMobile guard in main.js). */
-  #cursor-dot,
-  #cursor-ring { display: none !important; }
+  /* Hide Cursor and Desktop-only FX */
+  #cursor-dot, #cursor-ring, .hero-scroll, .menu-card-emoji {
+    display: none !important;
+  }
 }
 
-
-/* ── SMALL PHONE (≤ 600px) ────────────────────────────────── */
+/* SMALL PHONE (≤ 600px) */
 @media (max-width: 600px) {
-
-  /* Extra font clamping at very narrow widths */
-  .hero-title { font-size: clamp(2rem, 11vw, 3rem) !important; }
-
-  .hero-hours { display: none; }    /* no room for 4 time slots at 320px */
-
-  .about-image { min-height: 220px; }
-
-  .pkg-video-wrap { height: 220px; }
-
-  .story-pin { height: 300vh; }     /* shorter pin section — less scrolling needed */
-
-  /* Stack footer fully */
-  footer { grid-template-columns: 1fr; }
-
-  /* Tighten all section padding further */
-  .menu-section, .packages, .services, .testimonials, .area {
-    padding: 2.5rem 1rem;
+  .hero-title { font-size: 2.5rem !important; }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    bottom: 0;
+    margin-top: 2rem;
   }
-  .about-text { padding: 2rem 1rem !important; }
-
-  /* Menu grid — single column with snug cards */
-  .menu-grid { gap: .8rem; }
-  .menu-card { padding: 1.4rem 1rem; }
-
-  /* Package cards */
-  .pkg-card { padding: 1.5rem 1rem; }
 }
 
 
