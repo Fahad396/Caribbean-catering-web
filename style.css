@@ -621,7 +621,7 @@ nav.scrolled {
 }
 .menu-heading {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; color: var(--cream); line-height: 1.1;
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; color: #d9a711; line-height: 1.1;
 }
 .menu-heading em { font-style: italic; color: var(--gold); display: block; }
 .menu-link {
