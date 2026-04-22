@@ -633,8 +633,11 @@ nav.scrolled {
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem; max-width: 1200px; margin-inline: auto;
+  /* This says: fit as many columns as possible, each at least 280px wide */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; 
+  max-width: 1200px; 
+  margin-inline: auto;
 }
 
 .menu-card {
@@ -652,6 +655,31 @@ nav.scrolled {
   transform: translateY(-3px);
 }
 
+.menu-card-image {
+  position: relative;
+  width: calc(100% + 3.6rem); /* offsets the 1.8rem padding of the parent */
+  margin: -1.8rem -1.8rem 1.5rem -1.8rem; 
+  height: 180px;
+  overflow: hidden;
+  border-radius: 4px 4px 0 0;
+  background: rgba(247,237,216,.05); /* Placeholder color while loading */
+}
+
+/* 2. Image Style: Ensures all photos fit the same size without stretching */
+.menu-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This is crucial: it crops images to fit perfectly */
+  transition: transform .6s cubic-bezier(.25, 1, .5, 1);
+}
+
+/* 3. Hover Effect: Zoom the photo slightly */
+.menu-card:hover .menu-card-image img {
+  transform: scale(1.08);
+}
+
+
+
 /* Emoji pops up with spring on card hover */
 .menu-card-emoji {
   position: absolute; top: -20px; right: 14px; font-size: 2.2rem;
@@ -663,6 +691,7 @@ nav.scrolled {
 
 .menu-card-tag { font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: .8rem; font-weight: 500; }
 .menu-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; color: var(--cream); line-height: 1.2; margin-bottom: .6rem; }
+.menu-card-price { font-size: 1.25rem; font-weight: 500; color: var(--gold); margin-bottom: .6rem; }
 .menu-card-desc { font-size: .82rem; line-height: 1.65; color: rgba(247,237,216,.55); font-weight: 300; }
 .menu-card-feeds {
   margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid rgba(247,237,216,.08);
