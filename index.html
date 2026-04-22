@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avenues of the Caribbean | Haitian-Inspired Catering · Washington DC</title>
+
+  <!-- Google Fonts: Cormorant Garamond (display/editorial) + DM Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCROLL PROGRESS BAR
+       A thin gold line at top of viewport that fills
+       as the user scrolls down the page (driven by JS)
+  ════════════════════════════════════════════════════ -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       PAGE LOADER
+       Full-screen green overlay shown while the page
+       loads. Fades out after 1.2s. Contains the AOC
+       initials (staggered letter animation), a loading
+       bar, and food emoji that pop in one-by-one.
+  ════════════════════════════════════════════════════ -->
+  <div id="loader" role="status" aria-label="Loading">
+    <div class="loader-logo">
+      <span>A</span><span>O</span><span>C</span>
+    </div>
+    <div class="loader-sub">Avenues of the Caribbean</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+    <div class="loader-foods" aria-hidden="true">
+      <span>🍗</span><span>🦐</span><span>❤️</span><span>🍚</span><span>🌶️</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       CUSTOM CURSOR
+       Two layered elements: a small dot that tracks
+       the mouse precisely, and a larger ring that
+       follows with a smooth lag (RAF lerp in JS).
+       Both scale up when hovering interactive elements.
+  ════════════════════════════════════════════════════ -->
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       NAVIGATION
+       Fixed at top of page. Transparent over hero;
+       switches to solid green on scroll (.scrolled class
+       toggled by JS). Contains logo, nav links with
+       animated underlines, and an CTA button.
+  ════════════════════════════════════════════════════ -->
+  <nav id="main-nav">
+    <a href="#" class="nav-logo">
+      Avenues of the Caribbean
+      <span>Haitian-Inspired Catering · Washington DC</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#packages">Packages</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+    </ul>
+    <a href="https://www.avenuesofthecaribbean.com/online-ordering" class="nav-cta">Order Now</a>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════
+       HERO SECTION
+       Full-viewport landing area with:
+       - Animated background grid lines (parallax on scroll)
+       - Canvas with floating food emoji particles (JS)
+       - Three blurred radial orbs that drift slowly (CSS)
+       - Main headline with word-by-word entrance animation
+       - "Caribbean" word uses a shimmer gradient effect
+       - Business hours bar pinned to bottom
+       - Mouse parallax: content & orbs shift with cursor
+  ════════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg-pattern" aria-hidden="true"></div>
+    <div class="hero-grid-lines"  aria-hidden="true"></div>
+    <canvas id="hero-canvas"      aria-hidden="true"></canvas>
+    <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">Washington, DC · Maryland · Northern Virginia</div>
+      <p class="hero-eyebrow">Haitian-Inspired Caribbean Catering</p>
+      <h1 class="hero-title">
+        <!-- Each word wrapped in .word span — JS stagger-reveals them on load -->
+        <span class="word">Your</span>
+        <span class="word">Avenue</span><br>
+        <span class="word">to</span>
+        <span class="word">the</span>
+        <!-- shimmer-text applies a moving gold gradient via CSS animation -->
+        <em><span class="word shimmer-text">Caribbean</span></em>
+      </h1>
+      <p class="hero-sub">
+        Authentic and fusion Caribbean dishes rooted in Haitian tradition —
+        drop-off catering for corporate events, weddings, and social gatherings.
+      </p>
+      <div class="hero-actions">
+        <a href="https://www.avenuesofthecaribbean.com/online-ordering" class="btn-primary">Book Catering Now</a>
+        <a href="#menu" class="btn-ghost">Explore the Menu</a>
+      </div>
+    </div>
+
+    <!-- Hours bar at the bottom of the hero -->
+    <div class="hero-hours">
+      <div class="hero-hour"><div class="day">Friday</div>   <div class="time">12 PM – 5 PM</div></div>
+      <div class="hero-hour"><div class="day">Saturday</div> <div class="time">12 PM – 7 PM</div></div>
+      <div class="hero-hour"><div class="day">Sunday</div>   <div class="time">12 PM – 4 PM</div></div>
+      <div class="hero-hour"><div class="day">Mon – Thu</div><div class="time">Call for Availability</div></div>
+    </div>
+
+    <!-- Animated scroll indicator — line pulses to invite scrolling -->
+    <div class="hero-scroll" aria-hidden="true">Scroll</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       MARQUEE STRIP
+       Infinite horizontally-scrolling ticker of dish names
+       on an orange background. Duplicated content ensures
+       a seamless loop. aria-hidden so screen readers skip it.
+  ════════════════════════════════════════════════════ -->
+  <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="marquee-item">Griot &amp; Pikliz</div>
+      <div class="marquee-item">Curry Shrimp</div>
+      <div class="marquee-item">Black Mushroom Rice</div>
+      <div class="marquee-item">Stewed Oxtail</div>
+      <div class="marquee-item">Salmon Caribe</div>
+      <div class="marquee-item">Jerk Chicken</div>
+      <div class="marquee-item">Haitian Legume</div>
+      <div class="marquee-item">Rasta Pasta</div>
+      <div class="marquee-item">Fried Plantain</div>
+      <div class="marquee-item">Baked Ziti</div>
+      <!-- Duplicate set below for seamless infinite loop -->
+      <div class="marquee-item">Griot &amp; Pikliz</div>
+      <div class="marquee-item">Curry Shrimp</div>
+      <div class="marquee-item">Black Mushroom Rice</div>
+      <div class="marquee-item">Stewed Oxtail</div>
+      <div class="marquee-item">Salmon Caribe</div>
+      <div class="marquee-item">Jerk Chicken</div>
+      <div class="marquee-item">Haitian Legume</div>
+      <div class="marquee-item">Rasta Pasta</div>
+      <div class="marquee-item">Fried Plantain</div>
+      <div class="marquee-item">Baked Ziti</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       LOVE BANNER
+       Warm maroon strip with pulsing heart emoji and
+       brand taglines. Hearts animate with a lovePulse
+       CSS keyframe, staggered by nth-child delays.
+  ════════════════════════════════════════════════════ -->
+  <div class="love-banner" aria-label="Brand message">
+    <div class="love-banner-inner">
+      <span class="love-heart" aria-hidden="true">❤️</span>
+      <span class="love-banner-text">Made with love, served with soul — every dish tells a story</span>
+      <span class="love-heart" aria-hidden="true">🧡</span>
+      <span class="love-banner-text">Feed your people something unforgettable</span>
+      <span class="love-heart" aria-hidden="true">💛</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       KINETIC TEXT BAND 1
+       Large outlined italic type that physically moves
+       LEFT as the user scrolls (driven by JS onScroll).
+       Words light up gold as they pass the center of
+       the screen (.lit class toggled in JS).
+  ════════════════════════════════════════════════════ -->
+  <div class="kinetic-band" id="kinetic1" aria-hidden="true">
+    <div class="kinetic-track" id="kinetic-track1">
+      <span class="kinetic-item">Haitian Inspired</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Drop-Off Catering</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Washington DC</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Caribbean Soul</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Authentic Flavors</span><span class="kinetic-sep">·</span>
+      <!-- Duplicated for visual width — track is wide enough to never gap -->
+      <span class="kinetic-item">Haitian Inspired</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Drop-Off Catering</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Washington DC</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Caribbean Soul</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Authentic Flavors</span><span class="kinetic-sep">·</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       ABOUT SECTION
+       Two-column layout: left = dark image panel with
+       animated stat counters (JS counts up from 0 when
+       scrolled into view); right = brand story text.
+       Right panel uses .reveal.from-right for a slide-in.
+  ════════════════════════════════════════════════════ -->
+  <section class="about" id="about">
+    <div class="about-image">
+      <div class="about-image-inner">
+        <!-- Giant ghost "AOC" lettermark as decorative background -->
+        <div class="about-image-text" aria-hidden="true">AOC</div>
+      </div>
+
+      <!-- Stats animate from 0 to their target via data-count / data-suffix attrs -->
+      <div class="about-stats">
+        <div class="stat">
+          <div class="stat-num" data-count="48" data-suffix="h">0h</div>
+          <div class="stat-label">Advance notice for 10–50 guests</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" data-count="3" data-suffix="">0</div>
+          <div class="stat-label">Metro areas served</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" data-count="20" data-suffix="+">0</div>
+          <div class="stat-label">Signature dishes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" data-count="5" data-suffix="★">0</div>
+          <div class="stat-label">Client reviews</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text panel slides in from the right on scroll -->
+    <div class="about-text reveal from-right">
+      <div class="section-label">Our Story</div>
+      <h2 class="about-heading">
+        Rich flavors.<br>
+        <em>Caribbean soul.</em>
+      </h2>
+      <p class="about-body">
+        Avenues of the Caribbean (AOC) is a drop-off Caribbean catering service in Washington, D.C.
+        Our mission is to serve the richness and versatility of the Caribbean through a carefully curated
+        menu of authentic and fusion dishes with a strong Haitian influence.
+      </p>
+      <p class="about-body">
+        From griot to curry shrimp, black mushroom rice to rasta pasta — every dish is made to transport
+        you. Let us feed you and be your Avenue to the Caribbean.
+      </p>
+      <div class="about-cta">
+        <a href="https://www.avenuesofthecaribbean.com/online-ordering" class="btn-primary">Book Your Experience</a>
+        <a href="tel:8442628277" class="about-phone">
+          <span>Call us</span> (844) 262-8277
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       PINNED STORY PANEL (Scroll-driven showcase)
+       Container is 400vh tall. Inner .story-sticky is
+       position:sticky so it stays in view while the
+       outer div scrolls past. JS maps scroll progress
+       (0–1) to one of 4 dishes and swaps content with
+       slide transitions. Floating food emoji wobble
+       independently via CSS keyframes.
+  ════════════════════════════════════════════════════ -->
+  <div class="story-pin" id="story-pin">
+    <div class="story-sticky">
+
+      <!-- LEFT: text content — dish name, description, tag -->
+      <div class="story-left">
+        <!-- Vertical dot navigation (JS highlights active dot) -->
+        <div class="story-dots" aria-hidden="true">
+          <div class="story-dot active" data-idx="0"></div>
+          <div class="story-dot" data-idx="1"></div>
+          <div class="story-dot" data-idx="2"></div>
+          <div class="story-dot" data-idx="3"></div>
+        </div>
+
+        <!-- Counter: "01 / 04" — updated by JS as dishes change -->
+        <div class="story-counter">
+          <span>Signature Dish</span>
+          <span class="story-counter-num">
+            <span id="story-cur">01</span> / 04
+          </span>
+        </div>
+
+        <!-- Dish content — JS swaps innerHTML and applies transition classes -->
+        <div id="story-name" class="story-dish-name story-dish-active">
+          Griot<br><em>Pork Nuggets</em>
+        </div>
+        <div id="story-desc" class="story-dish-desc story-dish-active">
+          Marinated in a spicy citrus-infused blend, these tender pork shoulder nuggets
+          absorb layers of flavor before being fried to golden, crunchy perfection.
+          A Haitian staple — served with pikliz.
+        </div>
+        <div id="story-tag" class="story-dish-tag story-dish-active">
+          🔥 Extra Hot · Feeds 10
+        </div>
+      </div>
+
+      <!-- RIGHT: decorative panel with big ghost number, floating food, progress bar -->
+      <div class="story-right">
+        <!-- Giant translucent number that matches current dish index -->
+        <div class="story-bg-text" aria-hidden="true">
+          <div class="story-big-num" id="story-big-num">01</div>
+        </div>
+
+        <!-- Floating food emoji — each positioned absolutely and wobbling via CSS -->
+        <span class="food-float" style="top:12%;left:18%;" aria-hidden="true">🍗</span>
+        <span class="food-float" style="top:28%;left:65%;" aria-hidden="true">🌶️</span>
+        <span class="food-float" style="top:55%;left:25%;" aria-hidden="true">🦐</span>
+        <span class="food-float" style="top:70%;left:60%;" aria-hidden="true">❤️</span>
+        <span class="food-float" style="top:42%;left:78%;" aria-hidden="true">🍚</span>
+        <span class="food-float" style="top:82%;left:40%;" aria-hidden="true">🧅</span>
+
+        <!-- Vertical gold progress bar on the left edge, height driven by JS -->
+        <div class="story-progress-bar" aria-hidden="true">
+          <div class="story-progress-fill" id="story-fill"></div>
+        </div>
+        <!-- Dish name label bottom-right (subtle, fades) -->
+        <div class="story-right-label" aria-hidden="true">
+          <div class="name" id="story-side-name">Griot</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       KINETIC TEXT BAND 2
+       Moves RIGHT (opposite direction to band 1) as
+       user scrolls, listing menu dish names.
+  ════════════════════════════════════════════════════ -->
+  <div class="kinetic-band" id="kinetic2" aria-hidden="true">
+    <div class="kinetic-track" id="kinetic-track2">
+      <span class="kinetic-item">Stewed Oxtail</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Curry Shrimp</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Black Rice</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Salmon Caribe</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Rasta Pasta</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Fried Plantain</span><span class="kinetic-sep">·</span>
+      <!-- Duplicated for width -->
+      <span class="kinetic-item">Stewed Oxtail</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Curry Shrimp</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Black Rice</span><span class="kinetic-sep">·</span>
+      <span class="kinetic-item">Salmon Caribe</span><span class="kinetic-sep">·</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       STEAM WISPS
+       Five CSS-animated steam columns above the menu,
+       simulating heat rising from food. Each wisp uses
+       ::before and ::after pseudo-elements with staggered
+       animation delays for a natural, organic rhythm.
+  ════════════════════════════════════════════════════ -->
+  <div class="steam-container" aria-hidden="true">
+    <div class="steam-wisp"></div>
+    <div class="steam-wisp"></div>
+    <div class="steam-wisp"></div>
+    <div class="steam-wisp"></div>
+    <div class="steam-wisp"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       MENU SECTION
+       Grid of dish cards, each with:
+       - .menu-card-emoji: a food emoji that springs up
+         on hover (CSS scale transition + cubic-bezier)
+       - .reveal class: fades/slides in on scroll (JS IO)
+       - 3D tilt effect driven by JS mousemove
+       - Heart burst explosion spawned on mouseenter (JS)
+       Cards use auto-fill grid with 260px min column width.
+  ════════════════════════════════════════════════════ -->
+  <section class="menu-section" id="menu">
+    <div class="menu-header">
+      <div class="section-label" style="color:rgba(201,154,60,.8);">— À La Carte Offerings</div>
+      <h2 class="menu-heading">The <em>Menu</em></h2>
+      <a href="https://www.avenuesofthecaribbean.com/online-ordering" class="menu-link">Order Online →</a>
+    </div>
+
+    <div class="menu-grid">
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🐟</span>
+        <div class="menu-card-tag">Mains · Seafood</div>
+        <div class="menu-card-name">Salmon Caribe</div>
+        <div class="menu-card-desc">Thick, juicy salmon marinated and baked in a tomato-based citrus lemon butter sauce.</div>
+        <div class="menu-card-feeds">Feeds 8 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🦐</span>
+        <div class="menu-card-tag">Mains · Seafood</div>
+        <div class="menu-card-name">Curry Shrimp</div>
+        <div class="menu-card-desc">Scrumptious shrimp in a lightly spiced creamy coconut curry sauce. Best with white rice.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🥩</span>
+        <div class="menu-card-tag">Mains · Beef</div>
+        <div class="menu-card-name">Stewed Oxtail</div>
+        <div class="menu-card-desc">Succulent bone-in oxtail &amp; carrots in a delicious sweet &amp; savory stew.</div>
+        <div class="menu-card-feeds">Feeds 8–10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🍗</span>
+        <div class="menu-card-tag">Mains · Poultry</div>
+        <div class="menu-card-name">Stew Chicken</div>
+        <div class="menu-card-desc">Poule en sauce rich in flavor, prepared with mixed bell peppers, onions and tomatoes.</div>
+        <div class="menu-card-feeds">Feeds 8–10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🌶️</span>
+        <div class="menu-card-tag">Mains · Pork</div>
+        <div class="menu-card-name">Griot <span class="hot-badge">HOT</span></div>
+        <div class="menu-card-desc">Haitian pork nuggets marinated in citrus-spice blend, fried to golden, crunchy perfection. Served with pikliz.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🔥</span>
+        <div class="menu-card-tag">Mains · Poultry</div>
+        <div class="menu-card-name">Jerk Chicken <span class="hot-badge">EXTRA HOT</span></div>
+        <div class="menu-card-desc">Finger-licking jerk chicken with serious zing — a game day and party staple.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🐟</span>
+        <div class="menu-card-tag">Mains · Seafood</div>
+        <div class="menu-card-name">Crispy Snapper</div>
+        <div class="menu-card-desc">Bold island flavors — aromatic crispy snapper topped with carrots, green peppers and purple onions.</div>
+        <div class="menu-card-feeds">Feeds 8 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🧀</span>
+        <div class="menu-card-tag">Mains · Pasta</div>
+        <div class="menu-card-name">Baked Ziti</div>
+        <div class="menu-card-desc">Ziti baked in a four-cheese béchamel sauce with soft cheese clusters that melt in your mouth.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🍝</span>
+        <div class="menu-card-tag">Mains · Pasta</div>
+        <div class="menu-card-name">Rasta Pasta</div>
+        <div class="menu-card-desc">Rich, savory and smooth — mild jerk spice, heavy cream, colorful sweet peppers and your choice of protein.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🍚</span>
+        <div class="menu-card-tag">Rice · Haitian</div>
+        <div class="menu-card-name">Black Mushroom Rice</div>
+        <div class="menu-card-desc">Riz djon-djon — fragrant, flavorsome traditional Haitian rice that steals the show at every party.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🥗</span>
+        <div class="menu-card-tag">Vegetarian · Mains</div>
+        <div class="menu-card-name">Haitian Legume</div>
+        <div class="menu-card-desc">Vegetable medley of chayote, cabbage, peas &amp; carrots, slow-cooked then sautéed to perfection.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+      <div class="menu-card reveal">
+        <span class="menu-card-emoji" aria-hidden="true">🍌</span>
+        <div class="menu-card-tag">Sides</div>
+        <div class="menu-card-name">Fried Plantain</div>
+        <div class="menu-card-desc">Green plantains soaked in salt water, then fried — crunchy outside, moist inside. Served with sauce.</div>
+        <div class="menu-card-feeds">Feeds 10 people</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       GOLD SCRUB LINE
+       A horizontal 1px gold line that grows from left
+       to right as the packages section scrolls into view.
+       JS reads the element's bounding box and sets
+       scaleX(0–1) via inline style on scroll.
+  ════════════════════════════════════════════════════ -->
+  <div class="scrub-line-wrap" aria-hidden="true">
+    <div class="scrub-line" id="scrub-line"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       PACKAGES SECTION
+       Layout: full-width video hero at top, then two package cards below.
+
+       VIDEO AUTOPLAY SETUP:
+       ─ <video> uses: autoplay muted playsinline loop
+       ─ "autoplay" alone is blocked by most browsers unless "muted" is also set
+       ─ "playsinline" prevents iOS from going fullscreen automatically
+       ─ "loop" keeps it playing continuously
+       ─ "muted" is the KEY attribute — browsers only allow autoplay when muted
+       ─ poster="…" shows a still image while the video loads
+       ─ JS (in main.js) uses IntersectionObserver to pause when off-screen
+         and resume when back in view — saves CPU/battery
+
+       TO SWAP IN YOUR OWN VIDEO:
+       Replace the <source src="…"> URL with your video file path.
+       Supported formats: .mp4 (best), .webm (good fallback)
+       Recommended: 1280×720 or 1920×1080, compressed to <8MB for fast load.
+  ════════════════════════════════════════════════════ -->
+  <section class="packages" id="packages">
+
+    <!-- ── VIDEO HERO ─────────────────────────────────────
+         Full-width autoplay video banner at the top of the
+         packages section. The overlay div adds a dark tint
+         so the text remains readable over the video.
+         The glow-ring is a CSS animation — a pulsing gold
+         ring that radiates outward from the video frame.
+    ──────────────────────────────────────────────────── -->
+    <div class="pkg-video-wrap">
+
+      <!-- Glow ring that pulses around the video frame -->
+      <div class="pkg-video-glow" aria-hidden="true"></div>
+
+      <!--
+        VIDEO ELEMENT ATTRIBUTES EXPLAINED:
+        autoplay   → start playing as soon as possible
+        muted      → REQUIRED for autoplay to work in Chrome/Safari/Firefox
+        playsinline → REQUIRED on iOS to play inline (not fullscreen)
+        loop       → restart automatically when it ends
+        poster     → placeholder image shown before video loads
+        preload    → "metadata" loads only video info (duration/size), not full file
+        id         → JS uses this to pause/play on scroll visibility
+      -->
+      <video
+        id="pkg-video"
+        class="pkg-video"
+        autoplay
+        muted
+        playsinline
+        loop
+        preload="metadata"
+        poster="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80"
+        aria-label="Caribbean food catering showcase video"
+      >
+        <!--
+          SOURCE ELEMENTS — browser picks the first format it supports.
+          .webm is smaller/faster; .mp4 is the universal fallback.
+          Replace these src values with your actual video file paths.
+        -->
+        <source src="your-video.webm" type="video/webm">
+        <source src="your-video.mp4"  type="video/mp4">
+        <!-- Fallback text for browsers that don't support <video> -->
+        Your browser does not support HTML5 video.
+      </video>
+
+      <!-- Dark overlay so text is readable over video -->
+      <div class="pkg-video-overlay" aria-hidden="true"></div>
+
+      <!-- Text content layered above the video -->
+      <div class="pkg-video-content">
+        <div class="section-label" style="color:var(--gold); justify-content:center;">Catering Packages</div>
+        <h2 class="packages-heading">Choose Your <em>Spread</em></h2>
+        <p class="packages-sub">All packages require 48 hours advance notice. Serving groups of 10–50+ people.</p>
+      </div>
+
+      <!-- Video control button (JS toggles play/pause) -->
+      <button class="pkg-video-btn" id="pkg-video-btn" aria-label="Pause video">
+        <span id="pkg-video-icon">⏸</span>
+      </button>
+
+    </div><!-- /.pkg-video-wrap -->
+
+    <!-- ── PACKAGE CARDS ──────────────────────────────────
+         The two pricing cards below the video.
+    ──────────────────────────────────────────────────── -->
+    <div class="packages-inner">
+      <div class="pkg-grid">
+
+        <div class="pkg-card reveal">
+          <div class="pkg-name">Premium</div>
+          <div class="pkg-feeds">Feeds 20 People</div>
+          <ul class="pkg-items">
+            <li>Two Bases of your choice</li>
+            <li>Two Toppings of your choice</li>
+            <li>One Side or Salad</li>
+            <li>One Extra</li>
+          </ul>
+          <a href="https://www.avenuesofthecaribbean.com/online-ordering" class="pkg-order">Order Package</a>
+        </div>
+
+        <!-- .featured applies dark green background + gold "Most Popular" badge -->
+        <div class="pkg-card featured reveal">
+          <div class="pkg-name">Platinum</div>
+          <div class="pkg-feeds">Feeds 40–45 People</div>
+          <ul class="pkg-items">
+            <li>Three Bases of your choice</li>
+            <li>Three Toppings of your choice</li>
+            <li>Two Sides or Salads</li>
+            <li>Two Extras</li>
+          </ul>
+          <a href="https://www.avenuesofthecaribbean.com/online-ordering" class="pkg-order">Order Package</a>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       SERVICES SECTION
+       2-column heading + intro intro, then a 2×2 card
+       grid for the four service categories. Icons spin
+       on hover via CSS. Cards use .reveal for scroll-in.
+  ════════════════════════════════════════════════════ -->
+  <section class="services" id="services">
+    <div class="services-inner">
+      <div class="services-top reveal">
+        <h2 class="services-heading">How We <em>Serve</em></h2>
+        <p class="services-intro">
+          From intimate office lunches to grand wedding receptions — AOC brings the full flavor
+          of the Caribbean directly to your venue, anywhere in the DC metro area.
+        </p>
+      </div>
+      <div class="services-grid">
+
+        <div class="service-card reveal">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D9703A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-4 0v2"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+              <line x1="8"  y1="14" x2="16" y2="14"/>
+            </svg>
+          </div>
+          <div class="service-name">Corporate Catering</div>
+          <div class="service-desc">Impress your team and clients with authentic Caribbean cuisine delivered to your office or venue. Reliable, professional, on-time.</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D9703A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <div class="service-name">Wedding Catering</div>
+          <div class="service-desc">Make your wedding unforgettable with a Caribbean feast. We curate a menu that reflects your vision and feeds your guests beautifully.</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D9703A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="service-name">Social Events</div>
+          <div class="service-desc">Birthdays, celebrations, holiday parties — our drop-off catering makes hosting effortless and memorable.</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D9703A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <div class="service-name">Caribbean Cuisine Without Borders</div>
+          <div class="service-desc">Our global Caribbean concept brings the diverse culinary traditions of the islands to any audience.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       TESTIMONIALS SECTION
+       3-column grid of review cards. On scroll into view,
+       food confetti rains down (JS fires once via IO).
+       Stars pulse with lovePulse on card hover (CSS).
+       Each review quote opens with a beating ❤️ (CSS ::before).
+       Cards have staggered borderGlow animations (CSS).
+  ════════════════════════════════════════════════════ -->
+  <section class="testimonials" id="testimonials">
+    <div class="testimonials-inner">
+      <div class="section-label" style="color:rgba(201,154,60,.7); justify-content:center; margin-bottom:.5rem;">
+        — What Our Clients Say
+      </div>
+      <h2 class="testimonials-heading">Five Stars. <em>Every Time.</em></h2>
+      <div class="testimonial-grid">
+
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <div class="star"></div><div class="star"></div><div class="star"></div>
+            <div class="star"></div><div class="star"></div>
+          </div>
+          <div class="testimonial-text">"The food was flavorful and delicious! Can't wait to try some of the other dishes. Thanks!"</div>
+          <div class="testimonial-name">Simone A.</div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <div class="star"></div><div class="star"></div><div class="star"></div>
+            <div class="star"></div><div class="star"></div>
+          </div>
+          <div class="testimonial-text">"The food was delicious. Every dish was very flavorful and well-made. Compliments to the chef!"</div>
+          <div class="testimonial-name">Inayah K.</div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <div class="star"></div><div class="star"></div><div class="star"></div>
+            <div class="star"></div><div class="star"></div>
+          </div>
+          <div class="testimonial-text">"Poule en sauce, baked ziti, veggie medley and rice — definitely a hit in the office!"</div>
+          <div class="testimonial-name">Paul C.</div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <div class="star"></div><div class="star"></div><div class="star"></div>
+            <div class="star"></div><div class="star"></div>
+          </div>
+          <div class="testimonial-text">"The best rice I ever had and the chicken stew was so well seasoned. Cannot wait to place my next order!"</div>
+          <div class="testimonial-name">Nicole T.</div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <div class="star"></div><div class="star"></div><div class="star"></div>
+            <div class="star"></div><div class="star"></div>
+          </div>
+          <div class="testimonial-text">"Everything was amazing! Food was outstanding!! Thank you so much!! We will do it again!"</div>
+          <div class="testimonial-name">Kristen C.</div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">
+            <div class="star"></div><div class="star"></div><div class="star"></div>
+            <div class="star"></div><div class="star"></div>
+          </div>
+          <div class="testimonial-text">"AOC has a great team delivering amazing food. Their food presentation is impeccable. Highly recommend!"</div>
+          <div class="testimonial-name">Liz V.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       SERVICE AREA SECTION
+       Centered text block listing the three metro areas
+       served. Heading uses .split-chars — JS splits each
+       character into a <span> and they cascade in on scroll.
+  ════════════════════════════════════════════════════ -->
+  <section class="area">
+    <div class="area-inner reveal">
+      <div class="section-label" style="justify-content:center;">Our Reach</div>
+      <h2 class="area-heading">We Come to <em>You</em></h2>
+      <p class="area-sub">Drop-off catering delivered across the greater Washington DC metropolitan area.</p>
+      <div class="area-locations">
+        <div class="area-loc">Washington, DC</div>
+        <div class="area-loc">Maryland</div>
+        <div class="area-loc">Northern Virginia</div>
+      </div>
+      <p class="area-note">Outside the metro area? Reach out — we may be able to accommodate your event.</p>
+      <div style="margin-top:2rem;">
+        <a href="tel:8442628277" class="btn-primary">(844) 262-8277</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       FOOTER
+       4-column grid: brand + tagline + social links,
+       then navigation links, service links, and hours.
+  ════════════════════════════════════════════════════ -->
+  <footer>
+    <div class="footer-brand">
+      <span class="footer-logo">Avenues of the Caribbean</span>
+      <span class="footer-logo-sub">AOC · Est. Washington, DC</span>
+      <p class="footer-tagline">Bringing the richness and versatility of the Caribbean to your table.</p>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/avenuesofthecaribbean/" class="social-link" aria-label="Instagram">IG</a>
+        <a href="https://www.facebook.com/aveofthecarib/"          class="social-link" aria-label="Facebook">FB</a>
+        <a href="https://twitter.com/aveofthecarib"                class="social-link" aria-label="Twitter">X</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">Navigate</div>
+      <ul class="footer-links">
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#packages">Packages</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="https://www.avenuesofthecaribbean.com/contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-links">
+        <li><a href="https://www.avenuesofthecaribbean.com/corporate-caribbean-catering">Corporate</a></li>
+        <li><a href="https://www.avenuesofthecaribbean.com/wedding-catering-dc">Weddings</a></li>
+        <li><a href="https://www.avenuesofthecaribbean.com/caribbean-social-event-catering">Social Events</a></li>
+        <li><a href="https://www.avenuesofthecaribbean.com/global-caribbean-catering">Global Caribbean</a></li>
+        <li><a href="https://www.avenuesofthecaribbean.com/online-ordering">Order Online</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col footer-hours">
+      <div class="footer-col-title">Core Hours</div>
+      <div class="footer-hour-row"><span class="footer-day">Friday</span>   <span class="footer-time">12 PM – 5 PM</span></div>
+      <div class="footer-hour-row"><span class="footer-day">Saturday</span> <span class="footer-time">12 PM – 7 PM</span></div>
+      <div class="footer-hour-row"><span class="footer-day">Sunday</span>   <span class="footer-time">12 PM – 4 PM</span></div>
+      <div class="footer-hour-row"><span class="footer-day">Mon – Thu</span><span class="footer-time">By Appointment</span></div>
+    </div>
+  </footer>
+
+  <!-- Copyright bar below footer -->
+  <div class="footer-bottom">
+    <span class="footer-copy">® 2025–2026 Avenues of the Caribbean. All rights reserved.</span>
+    <a href="tel:8442628277" class="footer-phone">(844) 262-8277</a>
+  </div>
+
+  <!-- Main JavaScript file — loaded at end of body for performance -->
+  <script src="main.js"></script>
+
+</body>
+</html>

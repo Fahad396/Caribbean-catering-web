@@ -1,0 +1,1340 @@
+/* ═══════════════════════════════════════════════════════════════
+   style.css — Avenues of the Caribbean
+   Organised sections:
+     1. CSS Custom Properties (Design Tokens)
+     2. Reset & Base
+     3. Navigation
+     4. Hero Section
+     5. Marquee Strip
+     6. Love Banner
+     7. About Section
+     8. Kinetic Text Bands
+     9. Pinned Story Panel
+    10. Steam Wisps
+    11. Menu Section
+    12. Packages Section
+    13. Services Section
+    14. Testimonials Section
+    15. Service Area Section
+    16. Footer
+    17. Keyframe Animations
+    18. Scroll & Interactive Animations
+    19. Food & Love Animations
+    20. Responsive / Media Queries
+══════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────────
+   1. CSS CUSTOM PROPERTIES (Design Tokens)
+   All colours and key values live here — change once, updates
+   everywhere. Using CSS variables avoids magic numbers.
+───────────────────────────────────────────────────────────── */
+:root {
+  --green:    #1B3A2A; /* Primary dark forest green */
+  --green-lt: #2A5040; /* Lighter green for hover states */
+  --cream:    #F7EDD8; /* Main background / text on dark */
+  --cream-dk: #EFE0C0; /* Slightly darker cream accent */
+  --orange:   #D9703A; /* Hot accent colour */
+  --gold:     #C49A3C; /* Luxury accent — stats, labels, underlines */
+  --maroon:   #6B1E1E; /* Deep warm red for italic highlights */
+  --ink:      #111108; /* Near-black for footer background */
+  --mist:     #F2EAD8; /* Very light cream for services bg */
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   2. RESET & BASE
+   Normalise box model and set global font/colour defaults.
+───────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth; /* Smooth anchor link scrolling */
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  overflow-x: hidden; /* Prevent horizontal scroll from animations */
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   3. NAVIGATION
+   Fixed at top. Starts transparent over the hero, then gains
+   a green background when .scrolled class is added by JS.
+   Nav links have a gold underline that draws left→right on hover.
+───────────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 4rem;
+  background: transparent;
+  transition: background .4s, box-shadow .4s;
+}
+
+/* JS adds this class when scrollY > 60px */
+nav.scrolled {
+  background: var(--green);
+  box-shadow: 0 2px 24px rgba(0,0,0,.25);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem; font-weight: 600; letter-spacing: .06em;
+  color: var(--cream); text-decoration: none;
+  display: flex; flex-direction: column; line-height: 1.1;
+}
+.nav-logo span {
+  font-size: .65rem; font-weight: 300; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--gold);
+}
+
+.nav-links { display: flex; gap: 2.4rem; list-style: none; }
+
+.nav-links a {
+  position: relative; /* needed for ::after underline */
+  font-size: .78rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--cream); text-decoration: none; font-weight: 500;
+  opacity: .8; transition: opacity .2s;
+}
+.nav-links a:hover { opacity: 1; }
+
+/* Animated underline: scaleX(0→1) draws from right on hover */
+.nav-links a::after {
+  content: '';
+  position: absolute; bottom: -3px; left: 0;
+  width: 100%; height: 1px; background: var(--gold);
+  transform: scaleX(0); transform-origin: right;
+  transition: transform .3s ease;
+}
+.nav-links a:hover::after {
+  transform: scaleX(1); transform-origin: left;
+}
+
+.nav-cta {
+  background: var(--orange); color: #fff;
+  padding: .55rem 1.4rem; border-radius: 2px;
+  font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
+  text-decoration: none; font-weight: 500; transition: background .2s;
+}
+.nav-cta:hover { background: #c25e2a; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   4. HERO SECTION
+   Full-viewport dark green panel. Layers (back to front):
+     hero-bg-pattern → grid-lines → canvas → orbs → content
+   All absolutely-positioned layers fill the hero container.
+───────────────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  background: var(--green);
+  position: relative; overflow: hidden;
+  display: grid; place-items: center; /* centres hero-content */
+}
+
+/* Subtle radial colour blobs baked into the background */
+.hero-bg-pattern {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(201,154,60,.12) 0%, transparent 55%),
+    radial-gradient(circle at 80% 20%, rgba(217,112,58,.10) 0%, transparent 55%);
+}
+
+/* Fine grid overlay — drifts downward on scroll via JS */
+.hero-grid-lines {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(247,237,216,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247,237,216,.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* Canvas fills hero — JS draws floating food emoji particles here */
+#hero-canvas {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+}
+
+/* Blurred radial orbs that drift slowly via CSS keyframes */
+.hero-orb {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 1;
+  filter: blur(60px); /* blur makes them soft glow spheres */
+}
+.hero-orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(201,154,60,.18) 0%, transparent 70%);
+  top: -100px; left: -100px;
+  animation: orb1 18s ease-in-out infinite;
+}
+.hero-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(217,112,58,.14) 0%, transparent 70%);
+  bottom: -80px; right: -80px;
+  animation: orb2 22s ease-in-out infinite;
+}
+.hero-orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(107,30,30,.18) 0%, transparent 70%);
+  top: 40%; left: 60%;
+  animation: orb1 28s ease-in-out infinite reverse;
+}
+
+/* Gold pill badge with pulsing ring glow */
+.hero-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(201,154,60,.15); border: 1px solid rgba(201,154,60,.3);
+  border-radius: 999px; padding: .35rem 1rem;
+  font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.8rem;
+  animation: fadeUp .8s .1s both, badgePulse 3s 1s ease-in-out infinite;
+}
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold);
+}
+
+/* Content block — will-change enables GPU compositing for parallax */
+.hero-content {
+  position: relative; z-index: 2;
+  text-align: center; max-width: 900px; padding: 2rem;
+  animation: fadeUp .9s .2s both;
+  will-change: transform, opacity; /* JS drives parallax on this */
+}
+
+.hero-eyebrow {
+  font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--gold); font-weight: 400; margin-bottom: .8rem;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 300; line-height: .95;
+  color: var(--cream); margin-bottom: 1.6rem;
+}
+.hero-title em { font-style: italic; color: var(--orange); display: block; }
+
+/* Each word is wrapped in .word — JS reveals them with staggered delays */
+.hero-title .word {
+  display: inline-block;
+  opacity: 0; transform: translateY(40px) rotateX(-25deg);
+  transform-origin: bottom;
+  transition: opacity .6s ease, transform .6s ease;
+}
+.hero-title .word.show { opacity: 1; transform: translateY(0) rotateX(0); }
+
+/* Shimmer: moving gold→orange gradient on "Caribbean" text */
+.shimmer-text {
+  background: linear-gradient(90deg,
+    var(--orange) 0%, #f0a060 40%, var(--gold) 55%, var(--orange) 100%);
+  background-size: 400px 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3.5s ease-in-out infinite;
+}
+
+.hero-sub {
+  font-size: 1rem; font-weight: 300; line-height: 1.7;
+  color: rgba(247,237,216,.7); max-width: 540px; margin: 0 auto 2.5rem;
+}
+
+.hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* Shared button base styles */
+.btn-primary {
+  background: var(--orange); color: #fff;
+  padding: .85rem 2.2rem; border-radius: 2px;
+  font-size: .8rem; letter-spacing: .14em; text-transform: uppercase;
+  text-decoration: none; font-weight: 500;
+  transition: background .2s, transform .15s;
+}
+.btn-primary:hover { background: #c25e2a; transform: translateY(-1px); }
+
+.btn-ghost {
+  border: 1px solid rgba(247,237,216,.35); color: var(--cream);
+  padding: .85rem 2.2rem; border-radius: 2px;
+  font-size: .8rem; letter-spacing: .14em; text-transform: uppercase;
+  text-decoration: none; font-weight: 400;
+  transition: border-color .2s, background .2s;
+}
+.btn-ghost:hover { border-color: rgba(247,237,216,.7); background: rgba(247,237,216,.07); }
+
+/* Hours bar at base of hero */
+.hero-hours {
+  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 2rem; z-index: 2;
+  animation: fadeUp .7s .6s both;
+}
+.hero-hour { text-align: center; }
+.hero-hour .day  { font-size: .65rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+.hero-hour .time { font-size: .85rem; color: rgba(247,237,216,.75); font-weight: 300; margin-top: .15rem; }
+
+/* Scroll prompt — vertical line pulses below the word "Scroll" */
+.hero-scroll {
+  position: absolute; bottom: 2rem; right: 4rem; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  color: rgba(247,237,216,.4); font-size: .65rem; letter-spacing: .14em; text-transform: uppercase;
+  animation: fadeUp .7s .7s both;
+}
+.hero-scroll::after {
+  content: ''; width: 1px; height: 48px;
+  background: linear-gradient(to bottom, rgba(247,237,216,.4), transparent);
+  animation: scrollLine 2s ease-in-out infinite;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   5. MARQUEE STRIP
+   Infinite CSS animation scrolls content left. The track
+   contains the list twice so the loop is seamless.
+───────────────────────────────────────────────────────────── */
+.marquee-wrap {
+  background: var(--orange); overflow: hidden;
+  padding: .7rem 0; border-top: 1px solid rgba(255,255,255,.15);
+}
+.marquee-track {
+  display: flex; gap: 3rem; width: max-content;
+  animation: marquee 22s linear infinite;
+}
+.marquee-item {
+  font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(255,255,255,.9); font-weight: 500; white-space: nowrap;
+  display: flex; align-items: center; gap: 3rem;
+}
+.marquee-item::after { content: '·'; color: rgba(255,255,255,.5); }
+
+
+/* ─────────────────────────────────────────────────────────────
+   6. LOVE BANNER
+   Maroon strip with pulsing hearts and italic brand messages.
+   Hearts staggered via nth-child animation-delay.
+───────────────────────────────────────────────────────────── */
+.love-banner {
+  background: var(--maroon); padding: .9rem 2rem;
+  text-align: center; overflow: hidden;
+}
+.love-banner-inner {
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem; flex-wrap: wrap;
+}
+.love-banner-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 300; font-style: italic;
+  color: var(--cream); letter-spacing: .06em;
+}
+.love-heart {
+  font-size: 1.1rem; display: inline-block;
+  animation: lovePulse 1.8s ease-in-out infinite;
+}
+.love-heart:nth-child(3) { animation-delay: .6s; }
+.love-heart:nth-child(5) { animation-delay: 1.2s; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   7. ABOUT SECTION
+   Two-column grid. Left panel is dark with ghost lettermark
+   and floating stat cards. Right panel is light cream text.
+───────────────────────────────────────────────────────────── */
+.about { display: grid; grid-template-columns: 1fr 1fr; min-height: 85vh; }
+
+.about-image { background: var(--green-lt); position: relative; overflow: hidden; min-height: 500px; }
+
+.about-image-inner {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-lt) 50%, #1e4030 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+/* Ghost "AOC" lettermark — purely decorative, very low opacity */
+.about-image-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(6rem, 16vw, 14rem);
+  font-weight: 300; font-style: italic;
+  color: rgba(247,237,216,.06);
+  line-height: 1; user-select: none; text-align: center;
+}
+
+/* Stat cards — each floats vertically via floatY animation (staggered) */
+.about-stats {
+  position: absolute; bottom: 3rem; left: 3rem; right: 3rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.stat {
+  border-left: 2px solid var(--gold); padding-left: 1rem;
+  animation: floatY 5s ease-in-out infinite; /* gentle bob up/down */
+}
+.stat:nth-child(2) { animation-delay: 1.2s; }
+.stat:nth-child(3) { animation-delay: 2.4s; }
+.stat:nth-child(4) { animation-delay: 0.6s; }
+
+.stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.6rem; font-weight: 300; color: var(--cream); line-height: 1;
+}
+.stat-label {
+  font-size: .65rem; letter-spacing: .15em; text-transform: uppercase;
+  color: rgba(247,237,216,.5); margin-top: .25rem; font-weight: 400;
+}
+
+.about-text {
+  padding: 6rem 5rem; display: flex; flex-direction: column;
+  justify-content: center; background: var(--cream);
+}
+
+/* Reusable section label: small uppercase with an orange rule before it */
+.section-label {
+  font-size: .68rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--orange); font-weight: 500; margin-bottom: 1.2rem;
+  display: flex; align-items: center; gap: .6rem;
+}
+.section-label::before { content: ''; width: 24px; height: 1px; background: var(--orange); }
+
+.about-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 400; line-height: 1.15; color: var(--green); margin-bottom: 1.5rem;
+}
+.about-heading em { font-style: italic; color: var(--maroon); }
+
+.about-body { font-size: 1rem; line-height: 1.85; color: #3a3a30; max-width: 440px; font-weight: 300; }
+.about-body + .about-body { margin-top: 1rem; }
+.about-cta { margin-top: 2.5rem; }
+
+.about-phone {
+  display: flex; align-items: center; gap: .7rem;
+  font-size: .85rem; color: var(--green); text-decoration: none;
+  font-weight: 500; margin-top: 1rem; transition: gap .2s;
+}
+.about-phone:hover { gap: 1rem; }
+.about-phone span { font-size: .7rem; letter-spacing: .12em; color: var(--gold); text-transform: uppercase; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   8. KINETIC TEXT BANDS
+   Large outlined ghost type. JS translates the .kinetic-track
+   element left or right based on scroll position.
+   Individual words gain .lit class (gold fill) when near centre.
+───────────────────────────────────────────────────────────── */
+.kinetic-band {
+  overflow: hidden; background: var(--ink);
+  padding: 1.8rem 0; user-select: none;
+}
+.kinetic-track {
+  display: flex; width: max-content;
+  will-change: transform; /* hint browser for GPU compositing */
+}
+.kinetic-item {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 300; font-style: italic;
+  color: transparent; /* outlined only by default */
+  -webkit-text-stroke: 1px rgba(247,237,216,.18);
+  white-space: nowrap; padding: 0 2rem; letter-spacing: .04em;
+  transition: color .3s, -webkit-text-stroke .3s;
+}
+/* .lit is added by JS when this item is near viewport centre */
+.kinetic-item.lit {
+  color: var(--gold);
+  -webkit-text-stroke: 0px transparent;
+}
+.kinetic-sep {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  color: var(--orange); padding: 0 .5rem;
+  display: inline-flex; align-items: center; align-self: center;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   9. PINNED STORY PANEL
+   .story-pin is 400vh tall — this extra height gives JS
+   scroll distance to work with. .story-sticky is position:sticky
+   so it stays fixed in the viewport while the parent scrolls.
+   JS maps scroll progress (0–1) to dish index (0–3).
+───────────────────────────────────────────────────────────── */
+.story-pin { position: relative; height: 400vh; background: var(--green); }
+
+.story-sticky {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+
+/* Left side: text content */
+.story-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 5rem 4rem; position: relative;
+}
+
+/* Small vertical dot nav — JS sets .active on the current dot */
+.story-dots {
+  position: absolute; left: 2rem; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: .7rem;
+}
+.story-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(247,237,216,.2); transition: background .3s, transform .3s;
+}
+.story-dot.active { background: var(--gold); transform: scale(1.5); }
+
+.story-counter {
+  font-size: .65rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.5rem; font-weight: 500;
+  display: flex; align-items: center; gap: .8rem;
+}
+.story-counter-num { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; }
+
+/* Dish name, description, tag — these three elements swap via JS */
+.story-dish-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 300; color: var(--cream); line-height: 1.05; margin-bottom: 1.2rem;
+  transition: opacity .45s ease, transform .45s cubic-bezier(.16,1,.3,1);
+}
+.story-dish-name em { font-style: italic; color: var(--orange); }
+
+.story-dish-desc {
+  font-size: .95rem; line-height: 1.8; color: rgba(247,237,216,.6);
+  font-weight: 300; max-width: 380px;
+  transition: opacity .45s ease, transform .45s cubic-bezier(.16,1,.3,1);
+  transition-delay: .06s; /* slight lag behind name */
+}
+.story-dish-tag {
+  margin-top: 1.5rem; font-size: .65rem; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--gold); font-weight: 500;
+  transition: opacity .35s ease; transition-delay: .1s;
+}
+
+/* Transition state classes applied by JS during dish swap */
+.story-dish-out    { opacity: 0; transform: translateY(-18px); } /* exiting up */
+.story-dish-in     { opacity: 0; transform: translateY(18px);  } /* entering from below */
+.story-dish-active { opacity: 1; transform: translateY(0);     } /* fully visible */
+
+/* Right side: decorative panel */
+.story-right { position: relative; overflow: hidden; background: var(--green-lt); }
+
+/* Ghost dish number — very faint, fills the panel */
+.story-bg-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.story-big-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28vw; font-weight: 300; font-style: italic;
+  color: rgba(247,237,216,.04); line-height: 1; transition: color .5s ease;
+}
+
+/* Thin vertical gold progress bar on the left edge of the right panel */
+.story-progress-bar {
+  position: absolute; left: 0; bottom: 0;
+  width: 4px; height: 100%; background: rgba(247,237,216,.08);
+}
+.story-progress-fill {
+  width: 100%; background: var(--gold);
+  transition: height .1s linear; height: 0%;
+}
+
+.story-right-label { position: absolute; bottom: 3rem; right: 3rem; text-align: right; }
+.story-right-label .name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; color: var(--cream); font-weight: 300;
+  opacity: .4; transition: opacity .4s ease;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   10. STEAM WISPS
+   Five vertical strips, each with ::before and ::after
+   pseudo-elements that rise and shrink simultaneously,
+   mimicking steam heat above the menu section.
+───────────────────────────────────────────────────────────── */
+.steam-container {
+  display: flex; justify-content: center; gap: 2.5rem;
+  padding: .5rem 0; background: var(--cream);
+  pointer-events: none; overflow: hidden; height: 55px; align-items: flex-end;
+}
+.steam-wisp { width: 10px; position: relative; height: 50px; }
+.steam-wisp::before, .steam-wisp::after {
+  content: ''; position: absolute; bottom: 0;
+  width: 10px; height: 38px; border-radius: 50%;
+  background: rgba(217,112,58,.22); /* warm orange tint */
+  animation: steamRise 2.4s ease-in-out infinite;
+}
+/* ::after offset creates a natural double-wisp stagger */
+.steam-wisp::after                { animation-delay: 1.2s; opacity: .6; }
+.steam-wisp:nth-child(2)::before  { animation-delay: .5s; }
+.steam-wisp:nth-child(2)::after   { animation-delay: 1.7s; }
+.steam-wisp:nth-child(3)::before  { animation-delay: 1s; }
+.steam-wisp:nth-child(3)::after   { animation-delay: 2.2s; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   11. MENU SECTION
+   Dark green background. Cards use auto-fill grid (min 260px).
+   Each card can tilt in 3D via JS mousemove.
+   Each card has an emoji that springs up on hover.
+───────────────────────────────────────────────────────────── */
+.menu-section { background: var(--green); padding: 6rem 4rem; overflow: hidden; }
+
+.menu-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 3rem; max-width: 1200px; margin-inline: auto;
+}
+.menu-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; color: var(--cream); line-height: 1.1;
+}
+.menu-heading em { font-style: italic; color: var(--gold); display: block; }
+.menu-link {
+  font-size: .75rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--orange); text-decoration: none; font-weight: 500;
+  display: flex; align-items: center; gap: .5rem; white-space: nowrap; transition: gap .2s;
+}
+.menu-link:hover { gap: .9rem; }
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem; max-width: 1200px; margin-inline: auto;
+}
+
+.menu-card {
+  position: relative; overflow: visible !important; /* emoji pops above card */
+  background: rgba(247,237,216,.05); border: 1px solid rgba(247,237,216,.1);
+  border-radius: 4px; padding: 1.8rem;
+  transition: background .25s, border-color .25s, transform .25s;
+  transform-style: preserve-3d; /* needed for 3D tilt from JS */
+  will-change: transform;
+  cursor: default;
+}
+.menu-card:hover {
+  background: rgba(247,237,216,.09);
+  border-color: rgba(201,154,60,.35);
+  transform: translateY(-3px);
+}
+
+/* Emoji pops up with spring on card hover */
+.menu-card-emoji {
+  position: absolute; top: -20px; right: 14px; font-size: 2.2rem;
+  pointer-events: none; transform: scale(0) rotate(-20deg);
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1); /* overshoot spring */
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.4));
+}
+.menu-card:hover .menu-card-emoji { transform: scale(1) rotate(8deg); }
+
+.menu-card-tag { font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: .8rem; font-weight: 500; }
+.menu-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; color: var(--cream); line-height: 1.2; margin-bottom: .6rem; }
+.menu-card-desc { font-size: .82rem; line-height: 1.65; color: rgba(247,237,216,.55); font-weight: 300; }
+.menu-card-feeds {
+  margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid rgba(247,237,216,.08);
+  font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(247,237,216,.35); font-weight: 400;
+}
+
+/* Hot/spice badge pill */
+.hot-badge {
+  display: inline-block; background: rgba(217,112,58,.2); color: var(--orange);
+  font-size: .55rem; letter-spacing: .15em; text-transform: uppercase;
+  padding: .15rem .5rem; border-radius: 999px; margin-left: .4rem; vertical-align: middle;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   12. PACKAGES SECTION
+   Light cream background. Two cards side by side.
+   .featured card is dark green with gold "Most Popular" badge.
+   Gold scrub-line above this section grows on scroll via JS.
+───────────────────────────────────────────────────────────── */
+
+/* Gold line that expands left→right as user scrolls toward packages */
+.scrub-line-wrap { padding: 4rem 4rem 0; background: var(--cream); overflow: hidden; }
+.scrub-line {
+  height: 1px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .05s linear; /* JS updates this rapidly on scroll */
+}
+
+.packages { padding: 6rem 4rem; background: var(--cream); }
+.packages-inner { max-width: 1000px; margin-inline: auto; }
+.packages-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 400; color: var(--green);
+  line-height: 1.1; margin-bottom: .5rem;
+}
+.packages-heading em { font-style: italic; color: var(--maroon); }
+.packages-sub { font-size: .9rem; color: #5a5a48; font-weight: 300; margin-bottom: 3.5rem; }
+
+.pkg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+.pkg-card {
+  border: 1px solid rgba(27,58,42,.15); border-radius: 4px; padding: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: border-color .25s, transform .25s;
+}
+.pkg-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+
+/* Featured (Platinum) card — dark green treatment */
+.pkg-card.featured { background: var(--green); border-color: var(--green); }
+
+/* "Most Popular" badge generated purely in CSS */
+.pkg-card.featured::before {
+  content: 'Most Popular';
+  position: absolute; top: 1.2rem; right: 1.2rem;
+  background: var(--gold); color: var(--green);
+  font-size: .6rem; letter-spacing: .14em; text-transform: uppercase;
+  padding: .25rem .7rem; border-radius: 999px; font-weight: 600;
+}
+
+.pkg-name { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; margin-bottom: .3rem; }
+.pkg-card:not(.featured) .pkg-name { color: var(--green); }
+.pkg-card.featured      .pkg-name { color: var(--cream); }
+
+.pkg-feeds { font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; margin-bottom: 1.5rem; }
+.pkg-card:not(.featured) .pkg-feeds { color: var(--gold); }
+.pkg-card.featured      .pkg-feeds { color: rgba(247,237,216,.5); }
+
+.pkg-items { list-style: none; }
+.pkg-items li {
+  font-size: .85rem; padding: .45rem 0; font-weight: 300;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+  display: flex; align-items: center; gap: .6rem;
+}
+.pkg-card.featured .pkg-items li { border-bottom-color: rgba(247,237,216,.08); color: rgba(247,237,216,.8); }
+.pkg-items li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+.pkg-order {
+  display: inline-block; margin-top: 1.8rem;
+  font-size: .75rem; letter-spacing: .16em; text-transform: uppercase;
+  font-weight: 500; text-decoration: none; padding: .7rem 1.6rem; border-radius: 2px;
+  transition: all .2s;
+}
+.pkg-card:not(.featured) .pkg-order { background: var(--green); color: var(--cream); }
+.pkg-card:not(.featured) .pkg-order:hover { background: var(--green-lt); }
+.pkg-card.featured       .pkg-order { background: var(--orange); color: #fff; }
+.pkg-card.featured       .pkg-order:hover { background: #c25e2a; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   13. SERVICES SECTION
+   Mist-coloured background. 1fr/2fr heading layout above a
+   2×2 card grid. Service icons spin one full rotation on hover.
+───────────────────────────────────────────────────────────── */
+.services { background: var(--mist); padding: 6rem 4rem; }
+.services-inner { max-width: 1200px; margin-inline: auto; }
+.services-top { display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: start; margin-bottom: 3.5rem; }
+.services-heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; color: var(--green); line-height: 1.1; }
+.services-heading em { font-style: italic; color: var(--maroon); }
+.services-intro { font-size: .95rem; line-height: 1.8; color: #4a4a38; font-weight: 300; padding-top: .5rem; }
+.services-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; }
+
+.service-card {
+  background: #fff; border-radius: 4px; padding: 2rem;
+  border: 1px solid rgba(27,58,42,.08);
+  transition: border-color .25s, box-shadow .25s;
+}
+.service-card:hover { border-color: rgba(217,112,58,.3); box-shadow: 0 8px 32px rgba(27,58,42,.06); }
+
+/* Icon spins one full rotation on card hover */
+.service-icon {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(217,112,58,.1); margin-bottom: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.service-icon svg { width: 18px; height: 18px; }
+.service-card:hover .service-icon { animation: rotateSlow 1.2s linear; }
+
+.service-name { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; color: var(--green); margin-bottom: .5rem; }
+.service-desc { font-size: .83rem; line-height: 1.7; color: #5a5a48; font-weight: 300; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   14. TESTIMONIALS SECTION
+   Dark green background. 3-column grid. Effects:
+   - borderGlow animation on cards (staggered per nth-child)
+   - Stars pulse (lovePulse) on card hover
+   - ❤️ before each quote text (via ::before)
+   - Food confetti rains down on first scroll-into-view (JS)
+───────────────────────────────────────────────────────────── */
+.testimonials { background: var(--green); padding: 6rem 4rem; overflow: hidden; }
+.testimonials-inner { max-width: 1200px; margin-inline: auto; }
+.testimonials-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3rem); font-weight: 300; color: var(--cream);
+  margin-bottom: 3rem; text-align: center;
+}
+.testimonials-heading em { font-style: italic; color: var(--gold); }
+
+.testimonial-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+
+/* Staggered border glow animation per card */
+.testimonial-card {
+  background: rgba(247,237,216,.05); border: 1px solid rgba(247,237,216,.08);
+  border-radius: 4px; padding: 2rem; transition: background .25s;
+  animation: borderGlow 4s ease-in-out infinite;
+}
+.testimonial-card:hover { background: rgba(247,237,216,.09); }
+.testimonial-card:nth-child(2) { animation-delay: 1.3s; }
+.testimonial-card:nth-child(3) { animation-delay: 2.6s; }
+.testimonial-card:nth-child(4) { animation-delay: 0.8s; }
+.testimonial-card:nth-child(5) { animation-delay: 2s; }
+.testimonial-card:nth-child(6) { animation-delay: 3.3s; }
+
+.testimonial-stars { display: flex; gap: .2rem; margin-bottom: 1rem; }
+
+/* CSS star shape using clip-path polygon */
+.star {
+  width: 10px; height: 10px; background: var(--gold);
+  clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+
+/* Stars turn orange and pulse on card hover (cascade via nth-child delay) */
+.testimonial-card:hover .star { background: var(--orange); animation: lovePulse .55s ease forwards; }
+.testimonial-card:hover .star:nth-child(1) { animation-delay: 0s; }
+.testimonial-card:hover .star:nth-child(2) { animation-delay: .08s; }
+.testimonial-card:hover .star:nth-child(3) { animation-delay: .16s; }
+.testimonial-card:hover .star:nth-child(4) { animation-delay: .24s; }
+.testimonial-card:hover .star:nth-child(5) { animation-delay: .32s; }
+
+.testimonial-text {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-style: italic;
+  color: rgba(247,237,216,.8); line-height: 1.7; font-weight: 300; margin-bottom: 1.2rem;
+}
+
+/* Pulsing heart before every review quote */
+.testimonial-text::before {
+  content: '❤️ '; font-size: .85rem; display: inline-block;
+  animation: lovePulse 2.8s ease-in-out infinite;
+}
+
+.testimonial-name { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   15. SERVICE AREA SECTION
+   Centered text panel. Heading uses .split-chars —
+   JS wraps each letter in a <span>, they cascade in on scroll.
+───────────────────────────────────────────────────────────── */
+.area { background: var(--cream); padding: 5rem 4rem; text-align: center; }
+.area-inner { max-width: 700px; margin-inline: auto; }
+.area-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; color: var(--green); margin-bottom: .8rem;
+}
+.area-heading em { font-style: italic; color: var(--maroon); }
+.area-sub { font-size: .95rem; line-height: 1.8; color: #5a5a48; font-weight: 300; margin-bottom: 1rem; }
+.area-locations { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.area-loc {
+  font-size: .75rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--green); font-weight: 500; display: flex; align-items: center; gap: .4rem;
+}
+.area-loc::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+.area-note { font-size: .78rem; color: #7a7a60; font-weight: 300; font-style: italic; margin-top: .5rem; }
+
+
+/* ─────────────────────────────────────────────────────────────
+   16. FOOTER
+   Very dark background. 4-column grid layout.
+   Social links are circular with border that turns gold on hover.
+───────────────────────────────────────────────────────────── */
+footer {
+  background: var(--ink); padding: 4rem;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem; align-items: start;
+}
+.footer-logo     { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--cream); letter-spacing: .06em; display: block; margin-bottom: .2rem; }
+.footer-logo-sub { font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-weight: 400; display: block; margin-bottom: 1rem; }
+.footer-tagline  { font-size: .83rem; line-height: 1.7; color: rgba(247,237,216,.45); font-weight: 300; max-width: 240px; }
+
+.footer-social { display: flex; gap: .8rem; margin-top: 1.5rem; }
+.social-link {
+  width: 34px; height: 34px; border: 1px solid rgba(247,237,216,.15);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: rgba(247,237,216,.5); font-size: .65rem; letter-spacing: .04em;
+  text-decoration: none; transition: border-color .2s, color .2s;
+}
+.social-link:hover { border-color: var(--gold); color: var(--gold); }
+
+.footer-col-title { font-size: .65rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 1.2rem; }
+.footer-links { list-style: none; }
+.footer-links li { margin-bottom: .6rem; }
+.footer-links a { font-size: .83rem; color: rgba(247,237,216,.45); text-decoration: none; font-weight: 300; transition: color .2s; }
+.footer-links a:hover { color: var(--cream); }
+
+.footer-hour-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .5rem; }
+.footer-day  { font-size: .7rem;  letter-spacing: .1em; text-transform: uppercase; color: rgba(247,237,216,.35); font-weight: 400; }
+.footer-time { font-size: .82rem; color: rgba(247,237,216,.65); font-weight: 300; }
+
+.footer-bottom {
+  background: var(--ink); padding: 1.2rem 4rem;
+  border-top: 1px solid rgba(247,237,216,.06);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-copy  { font-size: .72rem; color: rgba(247,237,216,.25); font-weight: 300; }
+.footer-phone { font-size: .78rem; color: rgba(247,237,216,.45); text-decoration: none; font-weight: 400; transition: color .2s; }
+.footer-phone:hover { color: var(--gold); }
+
+
+/* ─────────────────────────────────────────────────────────────
+   17. KEYFRAME ANIMATIONS
+   All @keyframes in one place for easy reference.
+───────────────────────────────────────────────────────────── */
+
+/* Generic fade-up entrance (used on hero elements and loader) */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Simple opacity fade */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Marquee strip scrolls 50% of its width (since content is doubled) */
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* Scroll indicator line pulse */
+@keyframes scrollLine {
+  0%, 100% { opacity: .4; transform: scaleY(1); }
+  50%       { opacity: .8; transform: scaleY(1.4); }
+}
+
+/* Slow organic drift for hero orb 1 and orb 3 */
+@keyframes orb1 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%     { transform: translate(60px,-40px) scale(1.12); }
+  66%     { transform: translate(-40px,50px) scale(.9); }
+}
+
+/* Slow organic drift for hero orb 2 */
+@keyframes orb2 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  40%     { transform: translate(-70px,30px) scale(1.1); }
+  70%     { transform: translate(50px,-60px) scale(.88); }
+}
+
+/* Hero badge ring pulse — expanding ring that fades out */
+@keyframes badgePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(196,154,60,.35); }
+  50%     { box-shadow: 0 0 0 8px rgba(196,154,60,0); }
+}
+
+/* "Caribbean" text shimmer — moves background-position */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+/* Stat cards gentle vertical bob */
+@keyframes floatY {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-10px); }
+}
+
+/* Service icon 360° spin (triggered on hover) */
+@keyframes rotateSlow { to { transform: rotate(360deg); } }
+
+/* Testimonial card border colour oscillates gold */
+@keyframes borderGlow {
+  0%,100% { border-color: rgba(196,154,60,.15); }
+  50%     { border-color: rgba(196,154,60,.5); }
+}
+
+/* Loading bar grows from zero width */
+@keyframes lineGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Emoji / heart love pulse — scale up then settle */
+@keyframes lovePulse {
+  0%,100% { transform: scale(1); }
+  35%     { transform: scale(1.5); }
+  60%     { transform: scale(1.15); }
+}
+
+/* Food emoji pop in (loader and burst) */
+@keyframes foodPop {
+  from { opacity: 0; transform: scale(0) rotate(-30deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Steam wafts upward and shrinks */
+@keyframes steamRise {
+  0%   { transform: translateY(0) scaleX(1);      opacity: .5; }
+  50%  { transform: translateY(-18px) scaleX(1.5); opacity: .3; }
+  100% { transform: translateY(-44px) scaleX(.5);  opacity: 0; }
+}
+
+/* Food emoji floats wobble */
+@keyframes foodWobble {
+  0%,100% { transform: translateY(0)    rotate(-8deg) scale(1); }
+  25%     { transform: translateY(-14px) rotate(5deg)  scale(1.1); }
+  50%     { transform: translateY(-7px)  rotate(-3deg) scale(.94); }
+  75%     { transform: translateY(-16px) rotate(9deg)  scale(1.06); }
+}
+
+/* Heart/emoji particles fly outward then fade */
+@keyframes heartFly {
+  0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--hx),var(--hy)) scale(var(--hs)) rotate(var(--hr)); }
+}
+
+/* Confetti pieces fall from top of screen */
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg) scale(1);    opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg) scale(.7); opacity: 0; }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   18. SCROLL & INTERACTIVE ANIMATIONS
+   Classes applied/removed by JS based on scroll position
+   or user interaction.
+───────────────────────────────────────────────────────────── */
+
+/* Scroll progress bar — width driven by JS */
+#scroll-progress {
+  position: fixed; top: 0; left: 0; z-index: 200;
+  height: 2px; width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--orange));
+  transition: width .05s linear; pointer-events: none;
+}
+
+/* Base reveal state — elements start hidden and shifted down */
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity .75s cubic-bezier(.16,1,.3,1), transform .75s cubic-bezier(.16,1,.3,1);
+}
+/* Directional variants applied alongside .reveal */
+.reveal.from-left  { transform: translateX(-40px); }
+.reveal.from-right { transform: translateX(40px); }
+.reveal.scale-in   { transform: scale(.94); }
+/* JS adds .visible once element enters the viewport */
+.reveal.visible { opacity: 1; transform: none; }
+
+/* Section-level fade+scale reveal */
+.section-fade { opacity: 0; transform: scale(.97); transition: opacity .8s ease, transform .8s cubic-bezier(.16,1,.3,1); }
+.section-fade.visible { opacity: 1; transform: scale(1); }
+
+/* Heading clip-path wipe: content revealed top→bottom */
+.clip-reveal { clip-path: inset(0 0 100% 0); transition: clip-path .9s cubic-bezier(.16,1,.3,1); }
+.clip-reveal.visible { clip-path: inset(0 0 0% 0); }
+
+/* Character-by-character cascade — JS wraps each char in a <span> */
+.split-chars span {
+  display: inline-block; opacity: 0; transform: translateY(1.2em);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.16,1,.3,1);
+}
+.split-chars.visible span { opacity: 1; transform: translateY(0); }
+
+
+/* ─────────────────────────────────────────────────────────────
+   19. FOOD & LOVE ANIMATIONS
+   Purely decorative / joyful elements.
+───────────────────────────────────────────────────────────── */
+
+/* Custom cursor dot — tracks mouse instantly */
+#cursor-dot {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold); mix-blend-mode: screen;
+  transform: translate(-50%,-50%);
+  transition: width .2s ease, height .2s ease, opacity .2s ease;
+}
+
+/* Cursor ring — follows with lag (JS lerps position) */
+#cursor-ring {
+  position: fixed; pointer-events: none; z-index: 9998;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(196,154,60,.5);
+  transform: translate(-50%,-50%);
+  transition: width .25s ease, height .25s ease, opacity .2s ease;
+}
+
+/* Full-screen loader overlay */
+#loader {
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--green);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity .7s ease, visibility .7s;
+}
+#loader.done { opacity: 0; visibility: hidden; } /* JS adds .done after page loads */
+
+.loader-logo { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; color: var(--cream); letter-spacing: .1em; }
+.loader-logo span { display: inline-block; animation: fadeUp .6s both; }
+.loader-logo span:nth-child(1) { animation-delay: .05s; }
+.loader-logo span:nth-child(2) { animation-delay: .1s; }
+.loader-logo span:nth-child(3) { animation-delay: .15s; }
+.loader-sub  { font-size: .65rem; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin-top: .5rem; animation: fadeIn .8s .4s both; }
+.loader-bar  { width: 120px; height: 1px; background: rgba(247,237,216,.15); margin-top: 2rem; overflow: hidden; border-radius: 999px; }
+.loader-bar-fill { height: 100%; background: var(--gold); animation: lineGrow 1.1s .3s cubic-bezier(.16,1,.3,1) both; }
+
+/* Food emoji pop in below the loading bar */
+.loader-foods { display: flex; gap: 1rem; margin-top: 1.5rem; font-size: 1.6rem; }
+.loader-foods span { display: inline-block; opacity: 0; animation: foodPop .5s cubic-bezier(.34,1.56,.64,1) both; }
+.loader-foods span:nth-child(1) { animation-delay: .4s; }
+.loader-foods span:nth-child(2) { animation-delay: .55s; }
+.loader-foods span:nth-child(3) { animation-delay: .7s; }
+.loader-foods span:nth-child(4) { animation-delay: .85s; }
+.loader-foods span:nth-child(5) { animation-delay: 1s; }
+
+/* Floating food emoji in story panel — positioned absolutely by inline style */
+.food-float {
+  position: absolute; font-size: 1.8rem; pointer-events: none;
+  animation: foodWobble 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.3));
+  z-index: 3;
+}
+.food-float:nth-child(2) { animation-delay: .7s;  font-size: 1.5rem; }
+.food-float:nth-child(3) { animation-delay: 1.4s; font-size: 2rem; }
+.food-float:nth-child(4) { animation-delay: 2.1s; font-size: 1.3rem; }
+.food-float:nth-child(5) { animation-delay: 2.8s; font-size: 1.6rem; }
+.food-float:nth-child(6) { animation-delay: .35s; font-size: 1.4rem; }
+
+/* Heart/emoji burst particles — spawned by JS on card hover */
+.heart-burst {
+  position: fixed; pointer-events: none; z-index: 8000;
+  font-size: 1.4rem; user-select: none;
+  animation: heartFly 1.1s cubic-bezier(.16,1,.3,1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Confetti pieces — spawned by JS when testimonials enter view */
+.confetti-piece {
+  position: fixed; pointer-events: none; z-index: 7000;
+  font-size: 1.4rem; user-select: none;
+  animation: confettiFall linear forwards;
+  will-change: transform, opacity;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   12b. VIDEO AUTOPLAY — PACKAGES HERO
+   The video sits inside .pkg-video-wrap which is position:relative
+   so the overlay, content, and button can be absolutely stacked
+   on top of it. The glow ring pulses via CSS keyframes.
+   JS (main.js) handles pause-on-scroll and play/pause toggle.
+───────────────────────────────────────────────────────────── */
+
+/* Outer wrapper — gives the video a defined height and stacks layers */
+.pkg-video-wrap {
+  position: relative;
+  width: 100%;
+  height: 520px;           /* change this to adjust video section height */
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 4rem;
+}
+
+/* The actual <video> element — fills its wrapper completely */
+.pkg-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;        /* crop to fill — like background-size: cover */
+  object-position: center;  /* keep centre of video in frame */
+  display: block;
+}
+
+/* Dark gradient overlay so text above the video stays readable */
+.pkg-video-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(27,58,42,.55) 0%,
+    rgba(17,17,8,.70) 100%
+  );
+  z-index: 1;
+}
+
+/* Text content floats above overlay and video */
+.pkg-video-content {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 2rem;
+}
+
+/* Override heading colours so they're visible on dark video */
+.pkg-video-content .packages-heading { color: var(--cream); }
+.pkg-video-content .packages-sub     { color: rgba(247,237,216,.75); }
+
+/* Play/pause control button — bottom-right corner */
+.pkg-video-btn {
+  position: absolute; bottom: 1.2rem; right: 1.4rem; z-index: 3;
+  background: rgba(247,237,216,.15);
+  border: 1px solid rgba(247,237,216,.3);
+  color: var(--cream); font-size: 1rem;
+  width: 38px; height: 38px; border-radius: 50%;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .2s, transform .15s;
+  backdrop-filter: blur(4px);
+}
+.pkg-video-btn:hover { background: rgba(247,237,216,.28); transform: scale(1.08); }
+
+/* Gold pulsing ring that radiates from the video frame edges */
+.pkg-video-glow {
+  position: absolute; inset: -4px; z-index: 0;
+  border-radius: 10px;
+  border: 2px solid rgba(196,154,60,.6);
+  animation: videoGlowPulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Keyframe: glow ring pulses opacity and box-shadow */
+@keyframes videoGlowPulse {
+  0%, 100% {
+    opacity: .5;
+    box-shadow: 0 0 0   0 rgba(196,154,60,0),
+                0 0 20px 0 rgba(196,154,60,.1);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0  12px rgba(196,154,60,0),
+                0 0 40px 8px rgba(196,154,60,.25);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   11b. MENU CARD GLOW ANIMATION
+   Each menu card gets a multi-layer glow effect:
+   1. A rotating conic-gradient border (rainbow sweep — see @keyframes)
+   2. A pulsing box-shadow in gold/orange on hover
+   3. An inner shine sweep on hover (::after pseudo element)
+   The glow intensity is higher on hover.
+───────────────────────────────────────────────────────────── */
+
+/* Wrapper trick: card sits inside a glow-border container */
+.menu-card-glow-wrap {
+  position: relative;
+  border-radius: 6px;
+  padding: 2px; /* space for the animated border */
+  background: conic-gradient(
+    from var(--glow-angle, 0deg),
+    rgba(196,154,60,0)   0deg,
+    rgba(196,154,60,.7) 60deg,
+    rgba(217,112,58,.5) 120deg,
+    rgba(196,154,60,0) 180deg
+  );
+  animation: glowRotate 4s linear infinite;
+}
+
+/* Rotating conic-gradient border — angle advances via custom property */
+@property --glow-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes glowRotate {
+  to { --glow-angle: 360deg; }
+}
+
+/* Cards sit on top of the glowing border wrapper */
+.menu-card-glow-wrap .menu-card {
+  border: none; /* border replaced by wrapper's conic gradient */
+  position: relative; z-index: 1;
+}
+
+/* Pulsing box-shadow glow on every menu card (even without wrapper) */
+.menu-card {
+  animation: menuCardGlow 3.5s ease-in-out infinite;
+}
+/* Stagger glow timing so all cards don't pulse in sync */
+.menu-card:nth-child(2)  { animation-delay: .4s; }
+.menu-card:nth-child(3)  { animation-delay: .8s; }
+.menu-card:nth-child(4)  { animation-delay: 1.2s; }
+.menu-card:nth-child(5)  { animation-delay: 1.6s; }
+.menu-card:nth-child(6)  { animation-delay: 2.0s; }
+.menu-card:nth-child(7)  { animation-delay: 2.4s; }
+.menu-card:nth-child(8)  { animation-delay: 2.8s; }
+.menu-card:nth-child(9)  { animation-delay: 3.2s; }
+.menu-card:nth-child(10) { animation-delay: 0.2s; }
+.menu-card:nth-child(11) { animation-delay: 0.6s; }
+.menu-card:nth-child(12) { animation-delay: 1.0s; }
+
+@keyframes menuCardGlow {
+  0%, 100% {
+    box-shadow: 0 0  0   0 rgba(196,154,60,0),
+                0 0  8px 0 rgba(196,154,60,0);
+  }
+  50% {
+    box-shadow: 0 0  0   1px rgba(196,154,60,.25),
+                0 0 18px 4px rgba(196,154,60,.12);
+  }
+}
+
+/* Stronger glow + inner shine sweep on hover */
+.menu-card:hover {
+  box-shadow:
+    0 0  0   2px rgba(196,154,60,.5),
+    0 0 30px 6px rgba(196,154,60,.2),
+    0 0 60px 10px rgba(217,112,58,.1) !important;
+}
+
+/* Shine sweep — a white diagonal line that crosses the card on hover */
+.menu-card::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 4px;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255,255,255,.08) 50%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+  background-position: 100% 0; /* starts off-screen right */
+  transition: background-position .6s ease;
+  pointer-events: none; z-index: 4;
+}
+.menu-card:hover::after {
+  background-position: -100% 0; /* sweeps across to off-screen left */
+}
+
+/* Hot badge also glows */
+.hot-badge {
+  animation: hotBadgeGlow 1.8s ease-in-out infinite;
+}
+@keyframes hotBadgeGlow {
+  0%,100% { box-shadow: 0 0 0   0 rgba(217,112,58,0); }
+  50%     { box-shadow: 0 0 8px 3px rgba(217,112,58,.45); }
+}
+   Collapse multi-column layouts at narrower breakpoints.
+───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+
+  .hero-hours { gap: 1rem; bottom: 4rem; }
+  .hero-scroll { display: none; }
+
+  .about { grid-template-columns: 1fr; }
+  .about-text { padding: 3rem 2rem; }
+
+  .story-sticky { grid-template-columns: 1fr; }
+  .story-right  { display: none; }
+
+  .services-top  { grid-template-columns: 1fr; gap: 1rem; }
+  .services-grid { grid-template-columns: 1fr; }
+
+  .pkg-grid { grid-template-columns: 1fr; }
+  .pkg-video-wrap { height: 320px; }   /* shorter video on tablet */
+
+  .testimonial-grid { grid-template-columns: 1fr; }
+
+  footer { grid-template-columns: 1fr 1fr; gap: 2rem; padding: 3rem 2rem; }
+  .footer-bottom { flex-direction: column; gap: .5rem; padding: 1rem 2rem; text-align: center; }
+
+  .menu-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+  .menu-section, .packages, .services, .testimonials, .area { padding: 4rem 2rem; }
+}
+
+@media (max-width: 600px) {
+  footer { grid-template-columns: 1fr; }
+  .pkg-video-wrap { height: 240px; }   /* compact video on phone */
+}
