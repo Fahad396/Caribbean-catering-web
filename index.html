@@ -60,7 +60,7 @@
   <nav id="main-nav">
     <a href="#" class="nav-logo">
       Avenues of the Caribbean
-      <span>Haitian-Inspired Catering · Washington DC</span>
+
     </a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
@@ -92,8 +92,8 @@
     <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
 
     <div class="hero-content">
-      <div class="hero-badge">Washington, DC · Maryland · Northern Virginia</div>
-      <p class="hero-eyebrow">Haitian-Inspired Caribbean Catering</p>
+
+      <div class="hero-badge">Washington, DC · Maryland · Northern Virginia Haitian-Inspired Caribbean Catering</div>
       <h1 class="hero-title">
         <!-- Each word wrapped in .word span — JS stagger-reveals them on load -->
         <span class="word">Your</span>
@@ -180,21 +180,7 @@
        Words light up gold as they pass the center of
        the screen (.lit class toggled in JS).
   ════════════════════════════════════════════════════ -->
-  <div class="kinetic-band" id="kinetic1" aria-hidden="true">
-    <div class="kinetic-track" id="kinetic-track1">
-      <span class="kinetic-item">Haitian Inspired</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Drop-Off Catering</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Washington DC</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Caribbean Soul</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Authentic Flavors</span><span class="kinetic-sep">·</span>
-      <!-- Duplicated for visual width — track is wide enough to never gap -->
-      <span class="kinetic-item">Haitian Inspired</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Drop-Off Catering</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Washington DC</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Caribbean Soul</span><span class="kinetic-sep">·</span>
-      <span class="kinetic-item">Authentic Flavors</span><span class="kinetic-sep">·</span>
-    </div>
-  </div>
+ 
 
   <!-- ═══════════════════════════════════════════════════
        ABOUT SECTION
@@ -205,10 +191,12 @@
   ════════════════════════════════════════════════════ -->
   <section class="about" id="about">
     <div class="about-image">
-      <div class="about-image-inner">
-        <!-- Giant ghost "AOC" lettermark as decorative background -->
-        <div class="about-image-text" aria-hidden="true">AOC</div>
-      </div>
+<div class="about-image-inner">
+  <div class="about-image-text" aria-hidden="true">
+    <img src="logo.avif" alt="" class="about-ghost-logo">
+    <span>Caribbean</span>
+  </div>
+</div>
 
       <!-- Stats animate from 0 to their target via data-count / data-suffix attrs -->
       <div class="about-stats">
@@ -234,10 +222,7 @@
     <!-- Text panel slides in from the right on scroll -->
     <div class="about-text reveal from-right">
       <div class="section-label">Our Story</div>
-      <h2 class="about-heading">
-        Rich flavors.<br>
-        <em>Caribbean soul.</em>
-      </h2>
+
       <p class="about-body">
         Avenues of the Caribbean (AOC) is a drop-off Caribbean catering service in Washington, D.C.
         Our mission is to serve the richness and versatility of the Caribbean through a carefully curated
@@ -492,7 +477,27 @@
   <div class="scrub-line-wrap" aria-hidden="true">
     <div class="scrub-line" id="scrub-line"></div>
   </div>
-
+<video
+        id="pkg-video"
+        class="pkg-video"
+        autoplay
+        muted
+        playsinline
+        loop
+        preload="metadata"
+        #poster="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80"
+        aria-label="Caribbean food catering showcase video"
+      >
+        <!--
+          SOURCE ELEMENTS — browser picks the first format it supports.
+          .webm is smaller/faster; .mp4 is the universal fallback.
+          Replace these src values with your actual video file paths.
+        -->
+        <source src="your-video.webm" type="video/webm">
+        <source src="homevid.mp4"  type="video/mp4">
+        <!-- Fallback text for browsers that don't support <video> -->
+        Your browser does not support HTML5 video.
+      </video>
   <!-- ═══════════════════════════════════════════════════
        PACKAGES SECTION
        Layout: full-width video hero at top, then two package cards below.
@@ -544,7 +549,7 @@
         playsinline
         loop
         preload="metadata"
-        poster="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80"
+        #poster="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80"
         aria-label="Caribbean food catering showcase video"
       >
         <!--
@@ -553,7 +558,7 @@
           Replace these src values with your actual video file paths.
         -->
         <source src="your-video.webm" type="video/webm">
-        <source src="your-video.mp4"  type="video/mp4">
+        <source src="vid1.mp4"  type="video/mp4">
         <!-- Fallback text for browsers that don't support <video> -->
         Your browser does not support HTML5 video.
       </video>
@@ -580,8 +585,9 @@
     ──────────────────────────────────────────────────── -->
     <div class="packages-inner">
       <div class="pkg-grid">
-
+  
         <div class="pkg-card reveal">
+          
           <div class="pkg-name">Premium</div>
           <div class="pkg-feeds">Feeds 20 People</div>
           <ul class="pkg-items">
