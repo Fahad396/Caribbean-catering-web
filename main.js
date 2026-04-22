@@ -32,69 +32,84 @@
 
 
 /* ─────────────────────────────────────────────────────────────
+   MOBILE DETECTION
+   A single boolean checked before every desktop-only feature.
+   We use matchMedia('(pointer: coarse)') — the most reliable
+   signal that the primary input is a finger, not a mouse.
+   window.ontouchstart is a common fallback check.
+
+   Effects disabled on mobile:
+     • Custom cursor (no pointer on touchscreen)
+     • 3D card tilt (mousemove doesn't fire on touch)
+     • Magnetic buttons (same reason)
+     • Hero mouse parallax (mousemove-based)
+     • Marquee runs at half speed (set in CSS via animation-duration)
+───────────────────────────────────────────────────────────── */
+const isMobile = window.matchMedia('(pointer: coarse)').matches
+              || 'ontouchstart' in window
+              || navigator.maxTouchPoints > 0;
+
+
+/* ─────────────────────────────────────────────────────────────
    1. PAGE LOADER
-   Hides the full-screen #loader overlay once the page and all
-   assets have finished loading (window 'load' event).
-   CSS handles the fade-out via opacity + visibility transition.
 ───────────────────────────────────────────────────────────── */
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('loader').classList.add('done');
-  }, 1200); // small delay so users can see the animated food emojis
+  }, 1200);
 });
 
 
 /* ─────────────────────────────────────────────────────────────
    2. CUSTOM CURSOR
-   Two elements: a fast-responding dot (#cursor-dot) that
-   snaps to mouse position immediately, and a lagging ring
-   (#cursor-ring) that interpolates toward the mouse position
-   using linear interpolation (lerp) inside a requestAnimationFrame
-   loop. Both scale up when hovering over interactive elements.
+   Skipped entirely on mobile — isMobile guard means the rAF
+   loop never starts, saving CPU on every frame.
+   CSS also sets #cursor-dot / #cursor-ring to display:none
+   inside the 900px media query as a belt-and-suspenders fix.
 ───────────────────────────────────────────────────────────── */
 const cursorDot  = document.getElementById('cursor-dot');
 const cursorRing = document.getElementById('cursor-ring');
 
-// Target position (mouse) and current ring position (lerped)
-let mouseX = -100, mouseY = -100;
-let ringX  = -100, ringY  = -100;
+if (!isMobile && cursorDot && cursorRing) {
+  // Target position (mouse) and current ring position (lerped)
+  let mouseX = -100, mouseY = -100;
+  let ringX  = -100, ringY  = -100;
 
-// Track real-time mouse coordinates
-document.addEventListener('mousemove', e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-});
-
-// rAF loop: snap dot, lerp ring toward mouse
-(function animateCursor() {
-  // Dot follows exactly
-  cursorDot.style.left = mouseX + 'px';
-  cursorDot.style.top  = mouseY + 'px';
-
-  // Ring interpolates at 14% per frame — creates the lag effect
-  ringX += (mouseX - ringX) * 0.14;
-  ringY += (mouseY - ringY) * 0.14;
-  cursorRing.style.left = ringX + 'px';
-  cursorRing.style.top  = ringY + 'px';
-
-  requestAnimationFrame(animateCursor);
-})();
-
-// Scale cursor up when hovering interactive elements
-document.querySelectorAll('a, button, .menu-card, .pkg-card, .service-card').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursorDot.style.width  = '16px';
-    cursorDot.style.height = '16px';
-    cursorRing.style.width  = '52px';
-    cursorRing.style.height = '52px';
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
   });
-  el.addEventListener('mouseleave', () => {
-    cursorDot.style.width  = '8px';
-    cursorDot.style.height = '8px';
-    cursorRing.style.width  = '36px';
-    cursorRing.style.height = '36px';
+
+  // rAF loop: snap dot, lerp ring toward mouse
+  (function animateCursor() {
+    cursorDot.style.left = mouseX + 'px';
+    cursorDot.style.top  = mouseY + 'px';
+
+    // Ring interpolates at 14% per frame — creates the lag effect
+    ringX += (mouseX - ringX) * 0.14;
+    ringY += (mouseY - ringY) * 0.14;
+    cursorRing.style.left = ringX + 'px';
+    cursorRing.style.top  = ringY + 'px';
+
+    requestAnimationFrame(animateCursor);
+  })();
+
+  // Scale cursor up on interactive elements
+  document.querySelectorAll('a, button, .menu-card, .pkg-card, .service-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursorDot.style.width  = '16px';
+      cursorDot.style.height = '16px';
+      cursorRing.style.width  = '52px';
+      cursorRing.style.height = '52px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursorDot.style.width  = '8px';
+      cursorDot.style.height = '8px';
+      cursorRing.style.width  = '36px';
+      cursorRing.style.height = '36px';
+    });
   });
-});
+}
 
 
 /* ─────────────────────────────────────────────────────────────
@@ -177,36 +192,32 @@ animateFoodParticles();
 
 /* ─────────────────────────────────────────────────────────────
    5. HERO MOUSE PARALLAX
-   When the mouse moves within the hero section, the central
-   content and background orbs shift in opposite directions,
-   creating a sense of depth (parallax). Orbs move more than
-   content to emphasise the layering.
+   Skipped on mobile — mousemove doesn't fire on touchscreens.
+   On mobile, content stays centred and static (better UX anyway).
 ───────────────────────────────────────────────────────────── */
 const heroSection = document.querySelector('.hero');
 const heroContent = document.querySelector('.hero-content');
 const heroOrbs    = document.querySelectorAll('.hero-orb');
 
-heroSection.addEventListener('mousemove', e => {
-  const { left, top, width, height } = heroSection.getBoundingClientRect();
-  // Normalise mouse position to -0.5 … +0.5
-  const px = (e.clientX - left) / width  - 0.5;
-  const py = (e.clientY - top)  / height - 0.5;
+if (!isMobile && heroSection) {
+  heroSection.addEventListener('mousemove', e => {
+    const { left, top, width, height } = heroSection.getBoundingClientRect();
+    const px = (e.clientX - left) / width  - 0.5;
+    const py = (e.clientY - top)  / height - 0.5;
 
-  // Shift content gently toward mouse
-  heroContent.style.transform = `translate(${px * 14}px, ${py * 10}px)`;
+    heroContent.style.transform = `translate(${px * 14}px, ${py * 10}px)`;
 
-  // Shift each orb in the opposite direction (deeper layers move more)
-  heroOrbs.forEach((orb, i) => {
-    const magnitude = (i + 1) * 22;
-    orb.style.transform = `translate(${-px * magnitude}px, ${-py * magnitude}px)`;
+    heroOrbs.forEach((orb, i) => {
+      const magnitude = (i + 1) * 22;
+      orb.style.transform = `translate(${-px * magnitude}px, ${-py * magnitude}px)`;
+    });
   });
-});
 
-// Reset on mouse leave — elements spring back to natural position
-heroSection.addEventListener('mouseleave', () => {
-  heroContent.style.transform = '';
-  heroOrbs.forEach(orb => orb.style.transform = '');
-});
+  heroSection.addEventListener('mouseleave', () => {
+    heroContent.style.transform = '';
+    heroOrbs.forEach(orb => orb.style.transform = '');
+  });
+}
 
 
 /* ─────────────────────────────────────────────────────────────
@@ -394,50 +405,53 @@ function setStory(newIndex) {
 
 /* ─────────────────────────────────────────────────────────────
    10. MENU CARD 3D TILT
-   On mousemove within a card, calculate normalised cursor
-   position (-0.5 to +0.5) relative to the card's centre,
-   then apply a perspective rotateY/rotateX transform.
-   Reset smoothly on mouseleave.
+   Desktop only — mousemove doesn't fire on touchscreens.
+   On mobile we skip this entirely to avoid: (a) incorrect
+   transforms from synthesised touch→mouse events, and
+   (b) the residual transform left on the card if touchend
+   fires but mouseleave doesn't.
 ───────────────────────────────────────────────────────────── */
-document.querySelectorAll('.menu-card').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const { left, top, width, height } = card.getBoundingClientRect();
-    const px = (e.clientX - left) / width  - 0.5;
-    const py = (e.clientY - top)  / height - 0.5;
-    card.style.transform = `perspective(600px) rotateY(${px * 10}deg) rotateX(${-py * 8}deg) translateY(-4px)`;
-  });
+if (!isMobile) {
+  document.querySelectorAll('.menu-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const { left, top, width, height } = card.getBoundingClientRect();
+      const px = (e.clientX - left) / width  - 0.5;
+      const py = (e.clientY - top)  / height - 0.5;
+      card.style.transform = `perspective(600px) rotateY(${px * 10}deg) rotateX(${-py * 8}deg) translateY(-4px)`;
+    });
 
-  card.addEventListener('mouseleave', () => {
-    // Add transition briefly so it springs back smoothly
-    card.style.transition = 'transform .4s ease';
-    card.style.transform  = '';
-    setTimeout(() => card.style.transition = '', 400);
+    card.addEventListener('mouseleave', () => {
+      card.style.transition = 'transform .4s ease';
+      card.style.transform  = '';
+      setTimeout(() => card.style.transition = '', 400);
+    });
   });
-});
+}
 
 
 /* ─────────────────────────────────────────────────────────────
    11. MAGNETIC BUTTONS
-   Primary and ghost buttons subtly follow the cursor while
-   hovering, creating a "magnetic" attraction effect.
-   The offset is a fraction (22%) of the cursor's distance
-   from the button's centre.
+   Desktop only — same reason as 3D tilt. Magnetic pull relies
+   on continuous mousemove tracking which touchscreens don't
+   provide between touchstart and touchend.
 ───────────────────────────────────────────────────────────── */
-document.querySelectorAll('.btn-primary, .btn-ghost, .nav-cta').forEach(btn => {
-  btn.addEventListener('mouseenter', () => {
-    btn.style.transition = 'transform .1s ease, background .2s'; // fast while moving
+if (!isMobile) {
+  document.querySelectorAll('.btn-primary, .btn-ghost, .nav-cta').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      btn.style.transition = 'transform .1s ease, background .2s';
+    });
+    btn.addEventListener('mousemove', e => {
+      const { left, top, width, height } = btn.getBoundingClientRect();
+      const dx = (e.clientX - left - width  / 2) * 0.22;
+      const dy = (e.clientY - top  - height / 2) * 0.22;
+      btn.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transition = 'transform .4s ease, background .2s';
+      btn.style.transform  = '';
+    });
   });
-  btn.addEventListener('mousemove', e => {
-    const { left, top, width, height } = btn.getBoundingClientRect();
-    const dx = (e.clientX - left - width  / 2) * 0.22;
-    const dy = (e.clientY - top  - height / 2) * 0.22;
-    btn.style.transform = `translate(${dx}px, ${dy}px)`;
-  });
-  btn.addEventListener('mouseleave', () => {
-    btn.style.transition = 'transform .4s ease, background .2s'; // slow spring back
-    btn.style.transform  = '';
-  });
-});
+}
 
 
 /* ─────────────────────────────────────────────────────────────
@@ -646,9 +660,11 @@ function onScroll() {
   if (gridLines) gridLines.style.transform = `translateY(${scrollY * 0.18}px)`;
 
   /* ── Kinetic text bands ─────────────────────────────────── */
-  // Band 1 moves LEFT with scroll, Band 2 moves RIGHT (opposite direction)
-  if (kineticTrack1) kineticTrack1.style.transform = `translateX(${-(scrollY * 0.35)}px)`;
-  if (kineticTrack2) kineticTrack2.style.transform = `translateX(${  scrollY * 0.28 }px)`;
+  // On mobile: halve the scroll multiplier (0.35→0.18, 0.28→0.14)
+  // so the fast movement doesn't cause a layout-width flash on narrow screens.
+  const kSpeed = isMobile ? 0.5 : 1;
+  if (kineticTrack1) kineticTrack1.style.transform = `translateX(${-(scrollY * 0.35 * kSpeed)}px)`;
+  if (kineticTrack2) kineticTrack2.style.transform = `translateX(${  scrollY * 0.28 * kSpeed }px)`;
 
   /* ── Kinetic word lighting ──────────────────────────────── */
   // Words near the horizontal centre of the screen get .lit (turn gold)
