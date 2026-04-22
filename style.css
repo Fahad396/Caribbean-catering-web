@@ -29,16 +29,44 @@
    All colours and key values live here — change once, updates
    everywhere. Using CSS variables avoids magic numbers.
 ───────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   THEME: Black + Champagne Gold (Ultra Premium)
+   Inspired by Vera Wang luxury wedding aesthetics.
+   Matte black backgrounds, champagne gold accents,
+   warm white text, soft gray for secondary copy.
+
+   Swap guide (old → new):
+     --green    → --black      (primary dark surface)
+     --green-lt → --black-lt   (card / hover surface)
+     --cream    → --warm-white (primary light text / bg)
+     --cream-dk → --warm-white-dk
+     --orange   → --gold       (single accent — gold replaces orange)
+     --gold     → --gold-lt    (lighter gold for subtle labels)
+     --maroon   → --gold       (italic highlights use gold now)
+     --ink      → --ink        (footer stays near-black)
+     --mist     → --gray-pale  (very light gray for services bg)
+───────────────────────────────────────────────────────────── */
 :root {
-  --green:    #1B3A2A; /* Primary dark forest green */
-  --green-lt: #2A5040; /* Lighter green for hover states */
-  --cream:    #F7EDD8; /* Main background / text on dark */
-  --cream-dk: #EFE0C0; /* Slightly darker cream accent */
-  --orange:   #D9703A; /* Hot accent colour */
-  --gold:     #C49A3C; /* Luxury accent — stats, labels, underlines */
-  --maroon:   #6B1E1E; /* Deep warm red for italic highlights */
-  --ink:      #111108; /* Near-black for footer background */
-  --mist:     #F2EAD8; /* Very light cream for services bg */
+  /* ── Core palette ── */
+  --black:      #121212;   /* Matte black — hero, nav, story, testimonials bg */
+  --black-lt:   #1E1E1E;   /* Slightly lighter black — cards, hover surfaces */
+  --black-card: #252525;   /* Card interior — slightly warmer than surface */
+  --warm-white: #FAF9F6;   /* Warm white — main light bg and text on dark */
+  --warm-white-dk: #EEEce8;/* Slightly toned warm white */
+  --gold:       #E6C79C;   /* Champagne gold — primary accent */
+  --gold-dk:    #C9A46A;   /* Deeper gold for borders, active states */
+  --gray:       #A8A8A8;   /* Soft gray — secondary body copy */
+  --gray-pale:  #F2F0ED;   /* Near-white gray — services section bg */
+  --ink:        #0A0A0A;   /* True near-black for footer */
+
+  /* ── Semantic aliases (used throughout — don't change these names) ── */
+  --green:    var(--black);       /* keeps existing selectors working */
+  --green-lt: var(--black-lt);
+  --cream:    var(--warm-white);
+  --cream-dk: var(--warm-white-dk);
+  --orange:   var(--gold);        /* orange → champagne gold */
+  --maroon:   var(--gold-dk);     /* maroon italic → deeper gold */
+  --mist:     var(--gray-pale);
 }
 
 
@@ -1306,35 +1334,218 @@ footer {
 }
    Collapse multi-column layouts at narrower breakpoints.
 ───────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   20. RESPONSIVE / MEDIA QUERIES
+   Three breakpoints:
+     ≤ 900px  tablet + large phone  (most layout collapses)
+     ≤ 600px  small phone           (stack everything, max padding)
+     ≤ 400px  very small phone      (extra font-size clamping)
+
+   KEY MOBILE FIXES applied here:
+   ① Hero title — uses clamp() so it scales with viewport width
+      and never overflows. The browser respects the vw unit inside
+      clamp, so no horizontal scroll is caused by the heading.
+   ② Kinetic text bands — font-size reduced from "clamp(3rem,7vw,6rem)"
+      to a mobile-safe value so the large ghost text doesn't push
+      page width. overflow:hidden already set on .kinetic-band.
+   ③ About / Packages padding — tightened from 5–6rem side padding
+      to 1.2rem so text never touches screen edge.
+   ④ Custom cursor & 3D tilt — hidden/disabled via CSS.
+      JS also checks window.matchMedia to skip those effects entirely.
+   ⑤ Marquee — animation-duration increased (slower = no jitter).
+───────────────────────────────────────────────────────────── */
+
+/* ── TABLET (≤ 900px) ─────────────────────────────────────── */
 @media (max-width: 900px) {
-  nav { padding: 1rem 1.5rem; }
-  .nav-links { display: none; }
 
-  .hero-hours { gap: 1rem; bottom: 4rem; }
-  .hero-scroll { display: none; }
+  /* ── Navigation ── */
+  nav { padding: 1rem 1.2rem; }
+  .nav-links { display: none; }    /* hamburger would go here in a real project */
 
+  /* ── Hero ──
+     FIX ①: clamp(min, preferred, max) scales the title with vw.
+     At 400px wide: clamp gives ~2.2rem — fits without overflow.
+     overflow:hidden on .hero clips anything that somehow still bleeds. */
+  .hero { overflow: hidden; }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 10vw, 4.5rem) !important;
+    /* !important overrides the desktop clamp set on the element directly */
+    line-height: 1.05;
+    word-break: break-word;   /* prevent single long word from overflowing */
+  }
+
+  .hero-eyebrow { font-size: .62rem; letter-spacing: .16em; }
+
+  .hero-sub {
+    font-size: .9rem;
+    max-width: 100%;           /* was 540px — let it fill mobile width */
+    padding: 0 .5rem;
+  }
+
+  .hero-badge { font-size: .6rem; padding: .3rem .8rem; }
+
+  .hero-hours {
+    gap: .6rem;
+    bottom: 3.5rem;
+    flex-wrap: wrap;           /* hours wrap to 2 rows if very narrow */
+    justify-content: center;
+    padding: 0 1rem;
+  }
+  .hero-hour .day  { font-size: .55rem; }
+  .hero-hour .time { font-size: .75rem; }
+  .hero-scroll { display: none; }    /* scroll prompt not needed on touch */
+
+  /* ── Marquee ──
+     FIX ⑤: double the animation-duration (22s → 44s) on mobile.
+     Fast marquees cause layout thrashing on low-power chipsets,
+     which shows as jitter / dropped frames. Slower = smoother. */
+  .marquee-track { animation-duration: 44s; }
+
+  /* ── Love banner ── */
+  .love-banner { padding: .7rem 1rem; }
+  .love-banner-text { font-size: .9rem; }
+
+  /* ── Kinetic bands ──
+     FIX ②: shrink ghost text so it can't push page width.
+     overflow:hidden on .kinetic-band clips the overflow, but
+     a huge font-size can still affect scroll width in some browsers.
+     Setting a fixed px value at mobile width prevents that. */
+  .kinetic-item {
+    font-size: clamp(1.8rem, 6vw, 3rem) !important;
+    padding: 0 1rem;
+  }
+  .kinetic-sep { font-size: .9rem; }
+
+  /* ── About section ──
+     FIX ③: reduce aggressive desktop padding (6rem 5rem → 2.5rem 1.2rem).
+     1.2rem sides means 19px on a 320px phone — enough breathing room
+     without text touching the edge. */
   .about { grid-template-columns: 1fr; }
-  .about-text { padding: 3rem 2rem; }
+  .about-image { min-height: 280px; }
+  .about-stats {
+    bottom: 1.5rem; left: 1.2rem; right: 1.2rem;
+    gap: 1rem;
+  }
+  .stat-num   { font-size: 2rem; }
+  .stat-label { font-size: .6rem; }
 
+  .about-text {
+    padding: 2.5rem 1.2rem !important;  /* FIX ③ — was 6rem 5rem */
+  }
+  .about-heading { font-size: clamp(1.8rem, 6vw, 2.8rem); }
+  .about-body    { font-size: .92rem; max-width: 100%; }
+
+  /* ── Story pin ── */
   .story-sticky { grid-template-columns: 1fr; }
   .story-right  { display: none; }
+  .story-left   { padding: 3rem 1.2rem; }
+  .story-dish-name { font-size: clamp(2rem, 7vw, 3.5rem); }
+  .story-dish-desc { font-size: .88rem; }
 
+  /* ── Services ── */
   .services-top  { grid-template-columns: 1fr; gap: 1rem; }
   .services-grid { grid-template-columns: 1fr; }
+  .services-heading { font-size: clamp(1.8rem, 6vw, 2.8rem); }
+  .services, .menu-section, .testimonials, .area {
+    padding: 3.5rem 1.2rem;   /* FIX ③ — consistent safe padding */
+  }
 
+  /* ── Packages ──
+     FIX ③: was 4rem 2rem — reduce to 1.2rem horizontal on phone.
+     Also reduce video height so it doesn't dominate small screens. */
+  .packages { padding: 3.5rem 1.2rem; }
   .pkg-grid { grid-template-columns: 1fr; }
-  .pkg-video-wrap { height: 320px; }   /* shorter video on tablet */
+  .pkg-card { padding: 1.8rem 1.2rem; }
+  .pkg-video-wrap { height: 280px; border-radius: 4px; }
+  .pkg-video-content { padding: 1.2rem; }
+  .packages-heading { font-size: clamp(1.8rem, 6vw, 2.8rem); }
+  .packages-sub     { font-size: .85rem; }
+  .packages-inner   { padding: 0; }  /* inner div doesn't need extra padding */
 
-  .testimonial-grid { grid-template-columns: 1fr; }
-
-  footer { grid-template-columns: 1fr 1fr; gap: 2rem; padding: 3rem 2rem; }
-  .footer-bottom { flex-direction: column; gap: .5rem; padding: 1rem 2rem; text-align: center; }
-
+  /* ── Menu ── */
   .menu-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
-  .menu-section, .packages, .services, .testimonials, .area { padding: 4rem 2rem; }
+  .menu-heading { font-size: clamp(2rem, 7vw, 3rem); }
+  .menu-grid { grid-template-columns: 1fr; gap: 1rem; }
+  /* Disable 3D tilt on touch — pointer events don't track on mobile.
+     overflow:visible on menu-card causes emoji to clip — restore on mobile. */
+  .menu-card { overflow: hidden !important; }
+  .menu-card-emoji { display: none; }   /* emoji pop needs hover — no hover on touch */
+
+  /* ── Testimonials ── */
+  .testimonials-grid,
+  .testimonial-grid { grid-template-columns: 1fr; }
+  .testimonials-heading { font-size: clamp(1.8rem, 6vw, 2.6rem); }
+
+  /* ── Footer ── */
+  footer {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 3rem 1.2rem;    /* FIX ③ */
+  }
+  .footer-bottom {
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1rem 1.2rem;
+    text-align: center;
+  }
+
+  /* ── Custom cursor — hidden on touch devices ──
+     FIX ④: cursors make no sense on touchscreens and the rAF loop
+     wastes CPU. CSS hides the elements; JS skips the logic entirely
+     (see isMobile guard in main.js). */
+  #cursor-dot,
+  #cursor-ring { display: none !important; }
 }
 
+
+/* ── SMALL PHONE (≤ 600px) ────────────────────────────────── */
 @media (max-width: 600px) {
+
+  /* Extra font clamping at very narrow widths */
+  .hero-title { font-size: clamp(2rem, 11vw, 3rem) !important; }
+
+  .hero-hours { display: none; }    /* no room for 4 time slots at 320px */
+
+  .about-image { min-height: 220px; }
+
+  .pkg-video-wrap { height: 220px; }
+
+  .story-pin { height: 300vh; }     /* shorter pin section — less scrolling needed */
+
+  /* Stack footer fully */
   footer { grid-template-columns: 1fr; }
-  .pkg-video-wrap { height: 240px; }   /* compact video on phone */
+
+  /* Tighten all section padding further */
+  .menu-section, .packages, .services, .testimonials, .area {
+    padding: 2.5rem 1rem;
+  }
+  .about-text { padding: 2rem 1rem !important; }
+
+  /* Menu grid — single column with snug cards */
+  .menu-grid { gap: .8rem; }
+  .menu-card { padding: 1.4rem 1rem; }
+
+  /* Package cards */
+  .pkg-card { padding: 1.5rem 1rem; }
+}
+
+
+/* ── VERY SMALL PHONE (≤ 400px) ───────────────────────────── */
+@media (max-width: 400px) {
+
+  /* Prevent any inline clamp from being too large */
+  .hero-title { font-size: 2rem !important; }
+
+  .about-heading,
+  .packages-heading,
+  .services-heading,
+  .testimonials-heading,
+  .area-heading,
+  .menu-heading { font-size: 1.7rem !important; }
+
+  .story-dish-name { font-size: 1.9rem !important; }
+
+  nav { padding: .8rem 1rem; }
+  .nav-logo { font-size: 1rem; }
 }
