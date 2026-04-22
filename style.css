@@ -1378,7 +1378,7 @@ footer {
     padding: 1rem 1.2rem; 
     width: 100%;
   }
-  .nav-links { display: none; }
+  .nav-links { display: none; flex-direction: column;}
 
   /* ── Hero Section ── */
   .hero { 
