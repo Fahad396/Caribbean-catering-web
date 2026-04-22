@@ -383,8 +383,8 @@ nav.scrolled {
 /* Ghost "AOC" lettermark — purely decorative, very low opacity */
 .about-image-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(4rem, 12vw, 10rem);
-  font-weight: 300; 
+  font-size: clamp(2rem, 10vw, 8rem);
+  font-weight: 200; 
   font-style: italic;
   color: rgba(247,237,216,.06); /* Very low opacity */
   line-height: 1; 
