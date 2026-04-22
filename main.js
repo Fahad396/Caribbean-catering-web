@@ -145,7 +145,7 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
 // All possible food/love emoji that appear as particles
-const FOOD_EMOJIS = ['🍗','🦐','🌶️','🍚','❤️','🧡','💛','🥘','🍋','🧅','🍌','🥗'];
+const FOOD_EMOJIS = ['❤️'];
 
 // Build particle array — each with random starting position, speed, rotation
 const foodParticles = Array.from({ length: 28 }, () => ({
@@ -645,7 +645,7 @@ function onScroll() {
   const progress = scrollY / docH; // 0 → 1 across full page
 
   /* ── Scroll progress bar ────────────────────────────────── */
-  progressBar.style.width = (progress * 100) + '%';
+  progressBar.style.width = (progress * 90) + '%';
 
   /* ── Hero exit parallax ─────────────────────────────────── */
   // Content lifts up and fades as user scrolls away from hero
